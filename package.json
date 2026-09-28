@@ -1,0 +1,25 @@
+{
+  "name": "envirotech_intro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Envirotech 60-second corporate intro video (Remotion)",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v1.mp4",
+    "render:subs": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v1_subtitled.mp4 --props='{\"showSubtitles\":true}'",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.529",
+    "@remotion/fonts": "^4.0.529",
+    "@remotion/zod-types": "^4.0.529",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.529",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}
