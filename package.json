@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "render:concert": "remotion render src/index.ts EnvirotechConcert out/envirotech_concert_loop_1080p.mp4 --gl=swangle --crf=16",
     "render:concert:wide": "remotion render src/index.ts EnvirotechConcertUltrawide out/envirotech_concert_loop_ultrawide.mp4 --gl=swangle --crf=16",
-    "render:concert:preview": "remotion render src/index.ts EnvirotechConcert out/envirotech_concert_preview_540p.mp4 --gl=swangle --scale=0.5 --props='{\"shaderScale\":0.5,\"showLabels\":true,\"only\":\"\",\"music\":true}'"
+    "render:concert:preview": "remotion render src/index.ts EnvirotechConcert out/envirotech_concert_preview_540p.mp4 --gl=swangle --scale=0.5 --props='{\"shaderScale\":0.5,\"showLabels\":true,\"only\":\"\",\"music\":true,\"score\":\"electronic\"}'"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.529",

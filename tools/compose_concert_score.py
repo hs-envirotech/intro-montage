@@ -476,9 +476,8 @@ def circular_conv(x, ir):
     return out
 
 
-def main(path):
-    compose()
-    t = np.arange(N) / SR
+def render(path):
+    """Mix the buses (ducking, delay, reverb, master) and write a 16-bit WAV."""
 
     # side-chain pump: pads, bass and arps breathe with the kick
     duck = np.ones(N)
@@ -527,6 +526,11 @@ def main(path):
         w.setframerate(SR)
         w.writeframes((out * 32767).astype("<i2").tobytes())
     print(f"wrote {path}  {T:.1f}s  peak -1 dBFS")
+
+
+def main(path):
+    compose()
+    render(path)
 
 
 if __name__ == "__main__":
