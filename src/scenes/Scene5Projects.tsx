@@ -10,11 +10,11 @@ const X = 10;
 // Grounded and credible: verified project experience only (see PROJECTS in config.ts).
 export const Scene5Projects: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: colors.deepNavy }}>
-    <Shot from={0} duration={PRPC_DURATION} overlapOut={X} name="PRPC UF">
-      <PrpcUf />
-    </Shot>
-    <Shot from={PRPC_DURATION - X} duration={EMAS_DURATION} overlapIn={X} name="EMAS Project">
+    <Shot from={0} duration={EMAS_DURATION} overlapOut={X} name="EMAS Project (MRCSB)">
       <Emas />
+    </Shot>
+    <Shot from={EMAS_DURATION - X} duration={PRPC_DURATION} overlapIn={X} name="PRPC UF">
+      <PrpcUf />
     </Shot>
   </AbsoluteFill>
 );

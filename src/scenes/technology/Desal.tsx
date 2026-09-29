@@ -20,7 +20,7 @@ const SHORE_Z = -34;
 const INTAKE: Vec3[] = [[0, -0.3, 30], [0, 0.5, 12], [0, 0.5, SHORE_Z - 2], [0, 0.5, SHORE_Z - 6], [-2, 0.5, SHORE_Z - 8]];
 
 /** Dusk sky: deep navy overhead to a cool, low horizon light. */
-const Sky: React.FC = () => {
+export const Sky: React.FC = () => {
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({

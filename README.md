@@ -5,15 +5,44 @@ A cinematic corporate introduction for Envirotech, built in [Remotion](https://w
 
 > Envirotech delivers integrated water and wastewater solutions from engineering through operation.
 
-## Quick start
+## Render it on your own computer
+
+You need [Node.js](https://nodejs.org/) 22.6 or later (the LTS installer is fine) and Git.
 
 ```bash
+git clone https://github.com/hs-envirotech/intro-montage.git
+cd intro-montage
+git checkout claude/laughing-faraday-amnihv
 npm install
-npm run studio         # Remotion Studio at http://localhost:3000
-npm run render         # out/envirotech_intro_v1.mp4 (clean)
-npm run render:review  # out/envirotech_intro_v1_review.mp4 (VO subtitles + footage tags)
-npm run score          # regenerates the temp score from the scene timings
+
+npm run studio        # preview in the browser at http://localhost:3000
+npm run render:gpu    # render out/envirotech_intro_v2.mp4 using your graphics card (fastest)
+npm run render        # same, software 3D: slower, works on any machine
+npm run render:review # out/envirotech_intro_v2_review.mp4 with VO subtitles + placeholder tags
 ```
+
+The first render downloads Remotion's own headless Chrome (about 100 MB). With a GPU, a full render
+typically takes a few minutes; in software mode it can take about an hour. If `render:gpu` fails or
+gives black 3D frames on your machine, use `npm run render`.
+
+## Music
+
+To use your own track, drop an audio file (`.mp3`, `.wav`, `.m4a`, `.aac` or `.ogg`) into
+`assets/music/`. It is used in place of the temp score automatically, faded out over the last
+1.5 s. Set `ASSETS.musicStartSec` in `src/config.ts` to skip into the track, for example so its
+drop lands on the logo reveal at 54 s. The film's build follows this shape, so a track with a
+similar arc fits best:
+
+| Time | Picture | Music |
+|---|---|---|
+| 0–10 s | Droplet, underwater | Near silence, low atmosphere |
+| 10–25 s | Technology | Rhythm enters |
+| 25–40 s | Engineering, delivery | Builds |
+| 40–54 s | Projects, Silverstreams | Largest scale |
+| 54–60 s | Logo reveal | Sudden drop, one final impact, fade |
+
+Use only music you have a licence for. The included `envirotech_temp_score.wav` is synthesised
+by `scripts/generate_temp_score.mts` (`npm run score`) and is for review only.
 
 ## The film
 
@@ -23,9 +52,9 @@ npm run score          # regenerates the temp score from the scene timings
 | 7–17 s | 2 · Water technology | **UF**: a hollow fibre retains solids while permeate passes. **RO** (centrepiece): the pressure-vessel rack, high-pressure pump, and feed, permeate and concentrate flows. **Desalination**: a seawater intake leading to a coastal plant. **Water reclamation**: raw water → treatment → purified water → reuse. |
 | 17–27 s | 3 · Technology to engineering | Equipment assembles outward from the RO trains into one integrated plant. Water flows through the whole system as the camera pulls back to infrastructure scale. ENGINEER · INTEGRATE · DELIVER. |
 | 27–37 s | 4 · Engineering through operation | One continuous tracking shot. The plant moves from DESIGN (blueprint) → ENGINEER → BUILD → OPERATE (lit, flowing, monitored), then resolves to EPCC · O&M · BOT. |
-| 37–47 s | 5 · Project experience | **PRPC UF**, Pengerang, Johor, portable demineralised water treatment. **EMAS Project**, PMC, MRCSB. |
-| 47–54 s | 6 · Silverstreams | Wide aerial of a water facility integrated with a data-centre campus. SILVERSTREAMS · AWARDED CONCESSION · WATER INFRASTRUCTURE. |
-| 54–60 s | 7 · Reveal | The systems become one network, pull back and fall into darkness. An aqua light traces **ENVIROTECH**. It holds, then fades to black. No tagline. |
+| 37–47 s | 5 · Project experience | **EMAS Project**, PMC, MRCSB. Then **PRPC UF**, Pengerang, Johor, portable demineralised water treatment, with its delivered figures counting up. |
+| 47–54 s | 6 · Silverstreams | A fenced DAF → UF → RO compound, then a crane move up to the data-centre campus it will supply. SILVERSTREAMS · AWARDED CONCESSION · 4 MLD SWRO desalination plant · 20+10-year BOT concession. |
+| 54–60 s | 7 · Reveal | The systems become one network, pull back and fall into darkness. An aqua light traces the **official Envirotech logo**, then the slogan "Securing water for the next generation" appears. It holds, then fades to black. |
 
 The camera language recurs throughout, moving from micro to equipment, plant, infrastructure,
 campus and network. Each movement pushes through into the next rather than cutting like a
@@ -35,15 +64,19 @@ slideshow.
 
 All project facts live in `PROJECTS` in `src/config.ts`, and **only** those facts appear on screen:
 
-- **PRPC UF**: Pengerang, Johor · portable demineralised water treatment · delivered.
 - **EMAS Project**: MRCSB · Envirotech role **PMC** only. The visuals show coordination
   (interfaces, programme, documentation, site), not construction, supply or operation.
-- **Silverstreams**: **awarded concession**. It is never labelled completed or operational, and its
-  water routes are drawn as planned alignments, with no moving flow.
+- **PRPC UF**: Pengerang, Johor · portable demineralised water treatment · ultrapure, low-silica
+  water · design, supply, install, commission, O&M · 1.47 million m³ delivered · 3.6 MLD design
+  capacity (150 m³/hr) · 4.0 MLD peak (167 m³/hr) · 24/7 operations. These figures come from
+  Envirotech's PRPC project spotlight.
+- **Silverstreams**: 4 MLD SWRO desalination plant (DAF → UF → RO) · 20+10-year BOT concession ·
+  **awarded**. It is never labelled completed or operational, and its water routes are drawn as
+  planned alignments, with no moving flow.
 
 The capabilities (UF, RO, desalination, reclamation, EPCC, O&M, BOT) are shown as capabilities,
-never as completed projects. The film shows no capacities, dates, values, statistics, client logos
-or technology-partner names. Procedural imagery is captioned honestly on screen: "Illustrative
+never as completed projects. The only figures in the film are the project facts above. It shows no
+dates, values, client logos or technology-partner names. Procedural imagery is captioned honestly on screen: "Illustrative
 drawing", "Illustrative diagram" or "Concept visualisation".
 
 ## Footage slots
@@ -56,6 +89,11 @@ are all detected, as long as the name before the extension matches.
 |---|---|---|
 | PRPC UF site | `assets/footage/prpc_uf_site.mp4` | the isometric drawing of the containerised units |
 | EMAS Project site | `assets/footage/emas_project_site.mp4` | the coordination diagram |
+| Silverstreams concept render | `assets/footage/silverstreams_render.jpg` | the 3D compound and campus |
+
+For Silverstreams, use a concept render with no third-party branding visible: crop out, or pick a
+frame without, any campus or client signage. The "Concept visualisation" caption stays on because
+the plant is not built yet.
 
 Use genuine footage from those projects only. Never use stock or generic plant footage in these
 slots. In the Studio (and in `render:review`), a dashed "Footage placeholder" tag marks each empty
@@ -69,7 +107,7 @@ runs long when recorded, shorten the line rather than speeding up the delivery.
 
 ## Sound
 
-`assets/music/envirotech_temp_score.wav` is a **temp score**. It is synthesised by
+With no track of your own, `assets/music/envirotech_temp_score.wav` is used. It is a **temp score**. It is synthesised by
 `scripts/generate_temp_score.mts` and locked to the scene timings:
 
 - 0–10 s: atmosphere, the droplet and a sub-bass pulse.
@@ -98,9 +136,8 @@ of that scene's file.
 
 ## Rendering notes
 
-3D is rendered with software WebGL (`swangle`, set in `remotion.config.ts`), so renders work on
-machines without a GPU, including CI. On a workstation with a GPU you can pass `--gl=angle` for
-faster renders. To use a Chrome/Chromium that is already installed, set `REMOTION_BROWSER=/path/to/chrome`.
+3D is rendered with software WebGL (`swangle`) by default, so renders work on machines without a
+GPU, including CI. `npm run render:gpu` switches to the GPU (`--gl=angle`). To use a Chrome/Chromium that is already installed, set `REMOTION_BROWSER=/path/to/chrome`.
 
 ## Known limits of the procedural draft
 

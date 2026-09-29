@@ -5,10 +5,11 @@
   "description": "Envirotech 60-second corporate intro video (Remotion)",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v1.mp4 --props='{\"showSubtitles\":false,\"showPlaceholderLabels\":false}'",
-    "render:review": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v1_review.mp4 --props='{\"showSubtitles\":true,\"showPlaceholderLabels\":true}'",
+    "render": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v2.mp4 --props=props/final.json",
+    "render:review": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v2_review.mp4 --props=props/review.json",
     "score": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate_temp_score.mts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "render:gpu": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v2.mp4 --props=props/final.json --gl=angle"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.1",
@@ -26,5 +27,8 @@
     "@types/react": "^19.3.0",
     "@types/three": "^0.186.0",
     "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22.6"
   }
 }

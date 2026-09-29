@@ -1,11 +1,11 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
-import { COPY } from "../config";
+import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { clamp, lerp, prog, rand } from "../lib/anim";
-import { colors, ease, fonts } from "../theme";
+import { COPY } from "../config";
+import { annotationStyle, colors, ease } from "../theme";
 
 // Everything connects, pulls back to maximum scale, falls into darkness —
-// then one controlled aqua light traces the wordmark. No tagline.
+// then one controlled aqua light traces the official logo; a subtle slogan follows.
 const NETWORK = [0, 44] as const;
 const CONVERGE = [34, 56] as const;
 const TRACE = [62, 104] as const;
@@ -61,6 +61,7 @@ export const Scene7Reveal: React.FC = () => {
   const fill = prog(frame, FILL[0], FILL[1], ease.out);
   const glow = interpolate(frame, [TRACE[0], TRACE[1], FADE[0]], [0, 1, 0.7], clamp);
   const fade = interpolate(frame, [...FADE], [1, 0], clamp);
+  const slogan = interpolate(frame, [FILL[1] + 6, FILL[1] + 26], [0, 1], { ...clamp, easing: ease.out });
 
   const pos = (n: { x: number; y: number }) => ({
     x: lerp(C.x + (n.x - C.x) * pull, C.x, conv),
@@ -92,40 +93,83 @@ export const Scene7Reveal: React.FC = () => {
           <circle cx={C.x} cy={C.y} r={26} fill={colors.aqua} opacity={point * 0.18} />
         </svg>
 
-        {/* Controlled aqua illumination behind the wordmark */}
+        {/* Controlled aqua illumination behind the logo */}
         <AbsoluteFill style={{ opacity: glow * 0.55, background: `radial-gradient(ellipse 700px 180px at 50% 50%, rgba(22,177,196,0.22), transparent 70%)` }} />
 
-        <svg width="1920" height="1080" style={{ position: "absolute", inset: 0 }}>
-          <defs>
-            <filter id="traceGlow" x="-20%" y="-50%" width="140%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="b" />
-              <feMerge>
-                <feMergeNode in="b" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          <text
-            x={C.x}
-            y={C.y + 58}
-            textAnchor="middle"
-            fontFamily={fonts.heading}
-            fontWeight={800}
-            fontSize={164}
-            letterSpacing="0.08em"
-            fill={colors.paper}
-            fillOpacity={fill}
-            stroke={colors.aqua}
-            strokeWidth={2}
-            strokeOpacity={trace > 0 ? 1 - fill * 0.75 : 0}
-            strokeDasharray={1500}
-            strokeDashoffset={1500 * (1 - trace)}
-            filter="url(#traceGlow)"
-          >
-            {COPY.wordmark}
-          </text>
-        </svg>
+        <LogoReveal trace={trace} fill={fill} />
+        {/* Subtle slogan, arriving after the logo has settled */}
+        <div
+          style={{
+            ...annotationStyle,
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: LY + LOGO_H + 44,
+            textAlign: "center",
+            fontSize: 22,
+            letterSpacing: "0.34em",
+            paddingLeft: "0.34em",
+            color: "rgba(214,238,242,0.78)",
+            opacity: slogan,
+            transform: `translateY(${(1 - slogan) * 8}px)`,
+          }}
+        >
+          {COPY.slogan}
+        </div>
       </AbsoluteFill>
     </AbsoluteFill>
+  );
+};
+
+// Official Envirotech logo (white version, for dark backgrounds).
+const LOGO = staticFile("logo/envirotech_logo_white.png");
+const LOGO_W = 960;
+const LOGO_H = LOGO_W * (384 / 1004);
+const LX = C.x - LOGO_W / 2;
+const LY = C.y - LOGO_H / 2;
+
+/**
+ * An aqua light travels across the logo, drawing its outline (an edge
+ * extracted from the logo's own alpha), then the white logo fills in.
+ */
+const LogoReveal: React.FC<{ trace: number; fill: number }> = ({ trace, fill }) => {
+  const head = LX - 40 + (LOGO_W + 80) * trace;
+  const tracing = trace > 0 && trace < 1;
+  return (
+    <>
+      {/* Preload so the frame waits for the logo file */}
+      <Img src={LOGO} style={{ position: "absolute", width: 1, height: 1, opacity: 0 }} />
+      <svg width="1920" height="1080" style={{ position: "absolute", inset: 0 }}>
+        <defs>
+          <filter id="logoOutline" x="-5%" y="-10%" width="110%" height="120%">
+            <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="grown" />
+            <feComposite in="grown" in2="SourceAlpha" operator="out" result="edge" />
+            <feFlood floodColor={colors.aqua} />
+            <feComposite in2="edge" operator="in" result="line" />
+            <feGaussianBlur in="line" stdDeviation="4" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="line" />
+            </feMerge>
+          </filter>
+          <clipPath id="traced">
+            <rect x={0} y={0} width={Math.max(0, head)} height={1080} />
+          </clipPath>
+          <linearGradient id="headGlow" x1="0" x2="1">
+            <stop offset="0" stopColor={colors.aqua} stopOpacity="0" />
+            <stop offset="0.8" stopColor="#CFF5FA" stopOpacity="0.9" />
+            <stop offset="1" stopColor={colors.aqua} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {/* Outline, drawn behind the travelling light */}
+        <g clipPath="url(#traced)" opacity={1 - fill * 0.8}>
+          <image href={LOGO} x={LX} y={LY} width={LOGO_W} height={LOGO_H} filter="url(#logoOutline)" />
+        </g>
+        {/* The light itself: a soft vertical band at the tracing edge */}
+        {tracing && <rect x={head - 90} y={LY - 30} width={100} height={LOGO_H + 60} fill="url(#headGlow)" opacity={0.35} />}
+        {/* Solid logo */}
+        <image href={LOGO} x={LX} y={LY} width={LOGO_W} height={LOGO_H} opacity={fill} />
+      </svg>
+    </>
   );
 };

@@ -5,7 +5,7 @@ import { clamp, prog } from "../../lib/anim";
 import { FootageSlot } from "../../components/Footage";
 import { Vignette } from "../../components/Typography";
 import { IllustrativeTag, ProjectLockup, lineStyle } from "./ProjectLockup";
-import { colors, ease } from "../../theme";
+import { annotationStyle, colors, ease, fonts } from "../../theme";
 
 export const PRPC_DURATION = 160;
 
@@ -14,7 +14,7 @@ export const PRPC_DURATION = 160;
 // setting. Deliberately a drawing, not a photoreal "fake" of the site.
 const S = 36;
 const CX = 1230;
-const CY = 600;
+const CY = 500;
 const iso = (x: number, y: number, z: number) => [CX + (x - z) * 0.866 * S, CY + (x + z) * 0.5 * S - y * S] as const;
 const pts = (list: (readonly [number, number])[]) => list.map((p) => p.join(",")).join(" ");
 
@@ -169,6 +169,30 @@ const Drawing: React.FC = () => {
   );
 };
 
+type Stat = { value: number; decimals: number; unit: string; label: string };
+
+/** Delivered-performance figures, counting up one after another. */
+const StatRow: React.FC<{ stats: readonly Stat[]; frame: number; start: number }> = ({ stats, frame, start }) => (
+  <div style={{ position: "absolute", left: 900, right: 90, bottom: 190, display: "grid", gridTemplateColumns: "1.25fr 1fr 1fr 0.8fr", columnGap: 34 }}>
+    {stats.map((st, i) => {
+      const s0 = start + i * 12;
+      const a = interpolate(frame, [s0, s0 + 14], [0, 1], { ...clamp, easing: ease.out });
+      const v = interpolate(frame, [s0, s0 + 40], [0, st.value], { ...clamp, easing: ease.out });
+      return (
+        <div key={st.label} style={{ opacity: a, transform: `translateY(${(1 - a) * 12}px)`, borderTop: `2px solid ${i === 0 ? colors.seaGreen : "rgba(22,177,196,0.5)"}`, paddingTop: 16 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: 60, color: colors.white, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
+              {v.toFixed(st.decimals)}
+            </span>
+            <span style={{ fontFamily: fonts.heading, fontWeight: 600, fontSize: 24, color: colors.aqua }}>{st.unit}</span>
+          </div>
+          <div style={{ ...annotationStyle, fontSize: 13, letterSpacing: "0.18em", color: "rgba(255,255,255,0.75)", marginTop: 8, lineHeight: 1.5 }}>{st.label}</div>
+        </div>
+      );
+    })}
+  </div>
+);
+
 export const PrpcUf: React.FC = () => {
   const frame = useCurrentFrame();
   const p = PROJECTS.prpcUf;
@@ -192,8 +216,12 @@ export const PrpcUf: React.FC = () => {
         lines={[
           <div key="loc" style={lineStyle}>{p.location}</div>,
           <div key="scope" style={{ ...lineStyle, fontSize: 20, color: colors.aqua }}>{p.scope}</div>,
+          <div key="q" style={{ ...lineStyle, fontSize: 17, color: "rgba(255,255,255,0.7)" }}>{p.quality}</div>,
+          <div key="d" style={{ ...lineStyle, fontSize: 17, color: "rgba(255,255,255,0.7)" }}>{p.delivery}</div>,
         ]}
       />
+      <AbsoluteFill style={{ background: "linear-gradient(0deg, rgba(5,13,22,0.8) 0%, transparent 32%)" }} />
+      <StatRow stats={p.stats} frame={frame} start={40} />
       <Vignette />
     </AbsoluteFill>
   );

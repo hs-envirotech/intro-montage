@@ -47,9 +47,9 @@ export const VO: { text: string; inSec: number; outSec: number }[] = [
   { text: "At Envirotech, we integrate water and wastewater technologies with engineering, infrastructure and operations.", inSec: 7.6, outSec: 13.4 },
   { text: "From ultrafiltration and reverse osmosis, to desalination, water reclamation and integrated water systems.", inSec: 13.8, outSec: 19.6 },
   { text: "From engineering and project delivery, through operation and long-term performance.", inSec: 27.6, outSec: 32.4 },
-  { text: "With experience across industrial water and project management,", inSec: 38.0, outSec: 41.8 },
-  { text: "and new infrastructure now entering delivery.", inSec: 47.6, outSec: 49.9 },
-  { text: "Envirotech. Integrated water solutions, from engineering through operation.", inSec: 50.2, outSec: 53.8 },
+  { text: "With experience across project management and industrial water,", inSec: 38.0, outSec: 41.8 },
+  { text: "and new data-centre water infrastructure now entering delivery.", inSec: 47.2, outSec: 50.4 },
+  { text: "Envirotech. Integrated water solutions, from engineering through operation.", inSec: 50.6, outSec: 53.9 },
 ];
 
 // ── On-screen copy ───────────────────────────────────────────────────────────
@@ -64,20 +64,30 @@ export const COPY = {
   engineering: ["Engineer", "Integrate", "Deliver"],
   lifecycle: ["Design", "Engineer", "Build", "Operate"],
   deliveryModels: ["EPCC", "O&M", "BOT"],
-  wordmark: "ENVIROTECH",
+  // Subtle line under the logo in the final reveal.
+  slogan: "Securing water for the next generation",
 } as const;
 
 // ── Verified project experience ─────────────────────────────────────────────
 // ONLY these facts may appear. Do not add capacities, dates, values, statuses
-// or roles that are not listed here.
+// or roles that are not listed here. All figures below were supplied by Envirotech.
 export const PROJECTS = {
   prpcUf: {
-    // Delivered project experience.
+    // Delivered project experience. Figures from Envirotech's PRPC project spotlight.
     eyebrow: "Project experience",
     name: "PRPC UF",
     location: "Pengerang, Johor",
     scope: "Portable demineralised water treatment",
+    quality: "Ultrapure · low-silica water",
+    delivery: "Design · Supply · Install · Commission · O&M",
+    stats: [
+      { value: 1.47, decimals: 2, unit: "million m³", label: "Ultrapure water delivered" },
+      { value: 3.6, decimals: 1, unit: "MLD", label: "Design capacity · 150 m³/hr" },
+      { value: 4.0, decimals: 1, unit: "MLD", label: "Peak production · 167 m³/hr" },
+      { value: 24, decimals: 0, unit: "/7", label: "Round-the-clock operations" },
+    ],
   },
+  // Shown in this order: EMAS Project (MRCSB) first, then PRPC UF.
   emas: {
     // Envirotech role: PMC only. Not EPCC contractor, technology owner,
     // equipment supplier or operator.
@@ -90,7 +100,9 @@ export const PROJECTS = {
     // Awarded concession. NOT completed, NOT operational — never say so.
     name: "Silverstreams",
     status: "Awarded concession",
-    descriptor: "Water infrastructure",
+    plant: "4 MLD SWRO desalination plant",
+    process: ["DAF", "UF", "RO"],
+    model: "20+10-year BOT concession",
   },
 } as const;
 
@@ -102,13 +114,22 @@ export type Shot = { id: string; label: string; file: string };
 
 export const SHOTS = {
   prpcUf: { id: "prpcUf", label: "PRPC UF site, Pengerang — portable demin units", file: "footage/prpc_uf_site.mp4" },
+  // Shown in this order: EMAS Project (MRCSB) first, then PRPC UF.
   emas: { id: "emas", label: "EMAS Project site — coordination / PMC", file: "footage/emas_project_site.mp4" },
+  silverstreams: { id: "silverstreams", label: "Silverstreams concept render (DAF · UF · RO compound)", file: "footage/silverstreams_render.jpg" },
 } satisfies Record<string, Shot>;
 
 // ── Audio ────────────────────────────────────────────────────────────────────
 export const ASSETS = {
-  /** First audio file in /assets/music (alphabetical) is used. */
+  /**
+   * Music: any track you drop into /assets/music is used in preference to the
+   * generated temp score (first alphabetically if there are several).
+   */
   musicFolder: "music/",
-  musicFadeOutSec: 0.6,
+  tempScore: "music/envirotech_temp_score.wav",
+  /** Skip into your track by this many seconds (e.g. to land its drop on the 54 s reveal). */
+  musicStartSec: 0,
+  /** Fade-out on the final beat. */
+  musicFadeOutSec: 1.5,
   musicVolume: 1,
 } as const;

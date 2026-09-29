@@ -3,15 +3,16 @@ import { Html5Audio, interpolate, useVideoConfig } from "remotion";
 import { ASSETS, sec } from "../config";
 import { resolveAudioIn } from "../assets";
 
-/** Uses the first track in /assets/music with a fade-out on the final beat; silent otherwise. */
+/** Your track in /assets/music (or the temp score), faded out on the final beat; silent if none. */
 export const Music: React.FC = () => {
   const { durationInFrames } = useVideoConfig();
-  const src = resolveAudioIn(ASSETS.musicFolder);
+  const src = resolveAudioIn(ASSETS.musicFolder, ASSETS.tempScore);
   if (!src) return null;
   const fadeStart = durationInFrames - sec(ASSETS.musicFadeOutSec);
   return (
     <Html5Audio
       src={src}
+      trimBefore={sec(ASSETS.musicStartSec)}
       volume={(f) =>
         interpolate(f, [0, 10, fadeStart, durationInFrames], [0, ASSETS.musicVolume, ASSETS.musicVolume, 0], {
           extrapolateLeft: "clamp",

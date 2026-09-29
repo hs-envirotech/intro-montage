@@ -19,10 +19,11 @@ export const resolveMedia = (path: string): ResolvedMedia | null => {
   return { src: staticFile(match), kind: VIDEO_EXT.includes(ext(match)) ? "video" : "image" };
 };
 
-/** First audio file inside `folder` (alphabetical), or null. */
-export const resolveAudioIn = (folder: string): string | null => {
-  const hit = files()
+/** First audio file inside `folder` (alphabetical), preferring anything other than `fallback`. */
+export const resolveAudioIn = (folder: string, fallback?: string): string | null => {
+  const tracks = files()
     .filter((f) => f.startsWith(folder) && AUDIO_EXT.includes(ext(f)))
-    .sort()[0];
+    .sort();
+  const hit = tracks.find((f) => f !== fallback) ?? tracks[0];
   return hit ? staticFile(hit) : null;
 };
