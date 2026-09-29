@@ -5,4 +5,6 @@ Config.setPublicDir("./assets");
 Config.setVideoImageFormat("jpeg");
 Config.setOverwriteOutput(true);
 Config.setCodec("h264");
+// Software WebGL that works in headless/CI environments without a GPU.
+Config.setChromiumOpenGlRenderer("swangle");
 Config.setBrowserExecutable(process.env.REMOTION_BROWSER ?? null);

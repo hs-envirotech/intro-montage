@@ -4,7 +4,8 @@ import { loadFont } from "@remotion/fonts";
 
 // ── Brand colours ────────────────────────────────────────────────────────────
 export const colors = {
-  navy: "#21528A",
+  deepNavy: "#0B2239", // dominant environment tone
+  navy: "#21528A", // brand Blue
   seaGreen: "#14B096",
   aqua: "#16B1C4",
   slate: "#4A5C6A",
@@ -17,7 +18,7 @@ export const colors = {
   black: "#000000",
 } as const;
 
-// ── Fonts (Google Fonts: Manrope + Source Sans 3) ───────────────────────────────────────────────────────────────────
+// ── Fonts (Google Fonts: Manrope + Source Sans 3) ───────────────────────────
 // Manrope and Source Sans 3 variable fonts, downloaded from Google Fonts into
 // /assets/fonts so renders don't depend on network access at render time.
 const FONT_FILES = [
@@ -58,5 +59,14 @@ export const eyebrowStyle: React.CSSProperties = {
   fontWeight: 600,
   fontSize: type.eyebrow,
   letterSpacing: "0.22em",
+  textTransform: "uppercase",
+};
+
+/** Engineering-annotation label: small, tracked, precise. */
+export const annotationStyle: React.CSSProperties = {
+  fontFamily: fonts.heading,
+  fontWeight: 600,
+  fontSize: 20,
+  letterSpacing: "0.28em",
   textTransform: "uppercase",
 };

@@ -9,7 +9,7 @@ export const RemotionRoot: React.FC = () => (
       id="EnvirotechIntro"
       component={EnvirotechIntro}
       schema={introSchema}
-      defaultProps={{ showSubtitles: false }}
+      defaultProps={{ showSubtitles: false, showPlaceholderLabels: true }}
       durationInFrames={TOTAL_FRAMES}
       fps={VIDEO.fps}
       width={VIDEO.width}

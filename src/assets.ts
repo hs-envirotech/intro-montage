@@ -19,13 +19,6 @@ export const resolveMedia = (path: string): ResolvedMedia | null => {
   return { src: staticFile(match), kind: VIDEO_EXT.includes(ext(match)) ? "video" : "image" };
 };
 
-/** First existing file out of `candidates`, or null. */
-export const resolveFirst = (candidates: readonly string[]): string | null => {
-  const all = files();
-  const hit = candidates.find((c) => all.includes(c));
-  return hit ? staticFile(hit) : null;
-};
-
 /** First audio file inside `folder` (alphabetical), or null. */
 export const resolveAudioIn = (folder: string): string | null => {
   const hit = files()

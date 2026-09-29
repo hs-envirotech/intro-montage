@@ -1,94 +1,115 @@
-# Envirotech intro video
+# Envirotech: 60-second brand film
 
-A 60-second corporate intro for Envirotech (engineered water treatment, reuse & supply), built with
-[Remotion](https://www.remotion.dev/) (React). Renders to MP4 at 1920×1080, 30 fps.
+A cinematic corporate introduction for Envirotech, built in [Remotion](https://www.remotion.dev/)
+(React + three.js). It renders to MP4 at 1920×1080, 30 fps, 60 s.
+
+> Envirotech delivers integrated water and wastewater solutions from engineering through operation.
 
 ## Quick start
 
 ```bash
 npm install
-npm run studio      # opens Remotion Studio at http://localhost:3000
-npm run render      # renders out/envirotech_intro_v1.mp4
-npm run render:subs # renders out/envirotech_intro_v1_subtitled.mp4 (VO subtitles on)
+npm run studio         # Remotion Studio at http://localhost:3000
+npm run render         # out/envirotech_intro_v1.mp4 (clean)
+npm run render:review  # out/envirotech_intro_v1_review.mp4 (VO subtitles + footage tags)
+npm run score          # regenerates the temp score from the scene timings
 ```
 
-## Previewing in Remotion Studio
+## The film
 
-`npm run studio` opens the Studio in your browser.
+| Time | Movement | What happens |
+|---|---|---|
+| 0–7 s | 1 · Water / origin | Darkness, then a rim-lit droplet falls in slow motion onto still water. The ripple spreads, the camera dives under the surface, and suspended particles organise into membrane fibres. "WATER". |
+| 7–17 s | 2 · Water technology | **UF**: a hollow fibre retains solids while permeate passes. **RO** (centrepiece): the pressure-vessel rack, high-pressure pump, and feed, permeate and concentrate flows. **Desalination**: a seawater intake leading to a coastal plant. **Water reclamation**: raw water → treatment → purified water → reuse. |
+| 17–27 s | 3 · Technology to engineering | Equipment assembles outward from the RO trains into one integrated plant. Water flows through the whole system as the camera pulls back to infrastructure scale. ENGINEER · INTEGRATE · DELIVER. |
+| 27–37 s | 4 · Engineering through operation | One continuous tracking shot. The plant moves from DESIGN (blueprint) → ENGINEER → BUILD → OPERATE (lit, flowing, monitored), then resolves to EPCC · O&M · BOT. |
+| 37–47 s | 5 · Project experience | **PRPC UF**, Pengerang, Johor, portable demineralised water treatment. **EMAS Project**, PMC, MRCSB. |
+| 47–54 s | 6 · Silverstreams | Wide aerial of a water facility integrated with a data-centre campus. SILVERSTREAMS · AWARDED CONCESSION · WATER INFRASTRUCTURE. |
+| 54–60 s | 7 · Reveal | The systems become one network, pull back and fall into darkness. An aqua light traces **ENVIROTECH**. It holds, then fades to black. No tagline. |
 
-- **EnvirotechIntro** is the full 60-second film.
-- The **Scenes** folder has each scene as its own composition, so you can review one scene at a time.
-- **VO subtitles**: select `EnvirotechIntro` and switch on `showSubtitles` in the props panel on the
-  right. The subtitles are for checking timing only. They are off by default and are not part of the
-  final film.
+The camera language recurs throughout, moving from micro to equipment, plant, infrastructure,
+campus and network. Each movement pushes through into the next rather than cutting like a
+slideshow.
+
+## Accuracy rules (built into the code)
+
+All project facts live in `PROJECTS` in `src/config.ts`, and **only** those facts appear on screen:
+
+- **PRPC UF**: Pengerang, Johor · portable demineralised water treatment · delivered.
+- **EMAS Project**: MRCSB · Envirotech role **PMC** only. The visuals show coordination
+  (interfaces, programme, documentation, site), not construction, supply or operation.
+- **Silverstreams**: **awarded concession**. It is never labelled completed or operational, and its
+  water routes are drawn as planned alignments, with no moving flow.
+
+The capabilities (UF, RO, desalination, reclamation, EPCC, O&M, BOT) are shown as capabilities,
+never as completed projects. The film shows no capacities, dates, values, statistics, client logos
+or technology-partner names. Procedural imagery is captioned honestly on screen: "Illustrative
+drawing", "Illustrative diagram" or "Concept visualisation".
+
+## Footage slots
+
+The film is complete without footage: every slot has a procedural fallback. To use real footage,
+drop a file into `assets/footage/` with the name below. `.mp4`, `.mov`, `.webm`, `.jpg` and `.png`
+are all detected, as long as the name before the extension matches.
+
+| Slot | File | Replaces |
+|---|---|---|
+| PRPC UF site | `assets/footage/prpc_uf_site.mp4` | the isometric drawing of the containerised units |
+| EMAS Project site | `assets/footage/emas_project_site.mp4` | the coordination diagram |
+
+Use genuine footage from those projects only. Never use stock or generic plant footage in these
+slots. In the Studio (and in `render:review`), a dashed "Footage placeholder" tag marks each empty
+slot. Switch it off with the `showPlaceholderLabels` prop.
+
+## Voice-over
+
+There is no VO recording yet. The script and timings are in `VO` in `src/config.ts`. Turn on the
+`showSubtitles` prop to review them. The reveal (54–60 s) is left without VO on purpose. If a line
+runs long when recorded, shorten the line rather than speeding up the delivery.
+
+## Sound
+
+`assets/music/envirotech_temp_score.wav` is a **temp score**. It is synthesised by
+`scripts/generate_temp_score.mts` and locked to the scene timings:
+
+- 0–10 s: atmosphere, the droplet and a sub-bass pulse.
+- 10–25 s: the rhythm arrives, with hydraulic swells.
+- 25–40 s: a bass ostinato and mechanical impacts.
+- 40–54 s: the largest scale: pads, a faster pulse and a riser.
+- At 54 s: a sudden drop, then one deep tonal impact on the wordmark before the fade.
+
+Replace it with a composed or licensed track for release. The first audio file in `assets/music/`,
+alphabetically, is used. If you change the scene timings, run `npm run score` again.
 
 ## Project structure
 
 ```
-assets/                  Remotion's public folder (see remotion.config.ts)
-  footage/               drop real clips here (see "Swapping in footage")
-  logo/                  envirotech_logo_white.png: used automatically
-  music/                 drop one music track here: used automatically
-  fonts/                 Manrope + Source Sans 3 (downloaded from Google Fonts)
-src/
-  config.ts              scene timings, VO lines, on-screen copy, footage shot list
-  theme.ts               brand colours, fonts, easing, type scale
-  EnvirotechIntro.tsx    main composition: lays the scenes out end to end
-  Root.tsx               registers the compositions
-  scenes/                one component per scene
-  components/            Logo, Ripple, Footage (placeholder or real clip), Subtitles, Music
-out/                     rendered videos
+assets/            Remotion public dir: footage/, music/, fonts/ (Manrope, Source Sans 3), logo/
+scripts/           temp score generator
+src/config.ts      scene timings, VO, copy, verified project facts, footage slots
+src/theme.ts       palette (Deep Navy #0B2239 dominant), fonts, easing
+src/three/         3D toolkit: Stage, equipment (vessels, pumps, tanks, pipes, flows), plant, particles
+src/scenes/        one component per movement (+ technology/ and projects/ sub-shots)
+src/components/    typography (annotations, beat words), transitions, footage slots, subtitles, music
 ```
 
-### Adjusting timing
+Scene lengths are set in `SCENES` in `src/config.ts`. Beats inside a scene are constants at the top
+of that scene's file.
 
-Every timing lives in `src/config.ts`. Change a scene's `durationSec` and everything after it moves
-along automatically, including the total length and the subtitle cues. `voInSec` and `voOutSec` set
-when each VO subtitle appears, relative to the start of its scene. Animation beats inside a scene are
-constants at the top of that scene's file.
+## Rendering notes
 
-## Swapping in footage
+3D is rendered with software WebGL (`swangle`, set in `remotion.config.ts`), so renders work on
+machines without a GPU, including CI. On a workstation with a GPU you can pass `--gl=angle` for
+faster renders. To use a Chrome/Chromium that is already installed, set `REMOTION_BROWSER=/path/to/chrome`.
 
-Every footage slot is listed in `SHOTS` in `src/config.ts`. To replace a placeholder, put a clip in
-`assets/footage/` using the file name shown on the placeholder frame (for example
-`assets/footage/swro_membrane_racks.mp4`). The clip replaces the placeholder the next time the Studio
-refreshes or you render. `.mp4`, `.mov`, `.webm`, `.jpg` and `.png` are all recognised, as long as the
-file name before the extension matches. Clips play muted, are cropped to fill the frame, and get a slow
-push-in.
+## Known limits of the procedural draft
 
-Clips should be at least 1080p, cool and clean in grade, and a few seconds longer than their slot.
+Everything is generated in code. The water, membrane, plant and campus shots are stylised,
+physically motivated visualisations, not photoreal footage. To reach the full photoreal brief, you
+can:
 
-## Logo and music
-
-- **Logo:** the first file found from `ASSETS.logoCandidates` in `src/config.ts` is used, and it is
-  recoloured for each background (white on navy, navy on Paper). If no logo file is present, an
-  "ENVIROTECH" wordmark set in Manrope is used instead. The file supplied here is the official white
-  logo from the Envirotech brand kit. Its alpha channel has been normalised so it renders at full
-  opacity.
-- **Music:** if `assets/music/` has an audio file (`.mp3`, `.wav`, `.m4a`, `.aac` or `.ogg`), the
-  first one alphabetically is used. It fades out over the last 2.5 seconds (`ASSETS.musicFadeOutSec`).
-  If the folder is empty, the video is silent.
-
-## Fonts
-
-The brand fonts, Manrope (headings) and Source Sans 3 (body), are the Google Fonts variable fonts.
-They are stored in `assets/fonts/` and loaded with `@remotion/fonts`, so renders work without network
-access and every frame uses the same font version.
-
-## Rendering
-
-```bash
-npm run render
-# or, with explicit options:
-npx remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v1.mp4 --crf=18
-```
-
-Remotion downloads its own headless Chrome the first time you render. To use a Chrome/Chromium that
-is already installed, set `REMOTION_BROWSER=/path/to/chrome`.
-
-## Brand rules followed
-
-- Brand name is "Envirotech" only. No client names appear anywhere; the film shows capacities only.
-- Palette: Navy `#21528A`, Sea-green `#14B096`, Aqua `#16B1C4`, Slate `#4A5C6A`, Paper `#F4F7FB`.
-- Motion uses smooth easing and line sweeps only: no bounce, springs or flashy transitions.
-- File names use underscores.
+- drop real site footage into the slots above;
+- replace individual shots with offline 3D renders (for example Blender or Houdini) or filmed
+  plates, using the same timings; or
+- keep the procedural shots for the technology and network sequences, where scientific
+  visualisation suits them best.
