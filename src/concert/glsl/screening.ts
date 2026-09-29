@@ -9,6 +9,7 @@ const float W = 5.;      // screen walls at x = ±W
 const float BACK = 8.5;  // light wall behind the screens
 const float TOP = 15.;   // ceiling
 const vec2 HOLE = vec2(0., 2.6);
+float gFoot = 0.;   // extra distance already travelled (for filtering reflections)
 const float HOLE_R = 2.3;
 
 // 1 where the bar screen is open, 0 on steel. z runs along the channel.
@@ -60,7 +61,7 @@ vec3 sceneNoFloor(vec3 ro, vec3 rd, out float tHit){
     float t = (side * W - ro.x) / rd.x;
     vec3 p = ro + rd * t;
     if (t > 0. && t < tHit && p.y < TOP && p.z < uZEnd) {
-      float fw = t / (uRes.y * uFocal) / max(abs(rd.x), .05) / .55;
+      float fw = (t + gFoot) / (uRes.y * uFocal) / max(abs(rd.x), .05) / .55;
       wallG = mix(gap(p.z, p.y), .36, smoothstep(.25, .9, fw));
       float t2 = (side * BACK - ro.x) / rd.x;
       wallBack = backlight(ro + rd * t2) * .6;
@@ -102,7 +103,7 @@ vec3 sceneNoFloor(vec3 ro, vec3 rd, out float tHit){
     float b = fract(p.z / .55);
     float e = min(abs(b - .58), abs(b - .96));
     float wrap = exp(-e * 55.);
-    float fw = tHit / (uRes.y * uFocal) / max(abs(rd.x), .05) / .55;
+    float fw = (tHit + gFoot) / (uRes.y * uFocal) / max(abs(rd.x), .05) / .55;
     wrap = mix(wrap, .08, smoothstep(.25, .9, fw));
     vec3 steel = SLATE * .02 + mix(AQUA, ICE, .6) * wrap * .6 * (1. + uBeat);
     col = mix(steel * smoothstep(TOP, TOP - 4., p.y), wallBack, wallG);
@@ -148,12 +149,14 @@ void main(){
     vec2 fp = p.xz * vec2(1.4, .45) - vec2(0., uGT * 3.2);
     float e = .06;
     float h0 = fbm2(fp), hx = fbm2(fp + vec2(e, 0.)), hz = fbm2(fp + vec2(0., e));
-    vec3 n = normalize(vec3(-(hx - h0) / e * .12, 1., -(hz - h0) / e * .12));
+    float bump = .12 * exp(-tFloor * .09);     // ripples average out with distance
+    vec3 n = normalize(vec3(-(hx - h0) / e * bump, 1., -(hz - h0) / e * bump));
     vec3 rr = reflect(rd, n);
     float tR;
+    gFoot = 60. + tFloor * 3.;   // rippled reflections only show the average glow of the screens
     vec3 refl = sceneNoFloor(p + n * .01, rr, tR);
     float fres = .04 + .96 * pow(1. - SAT(dot(-rd, n)), 5.);
-    float foam = smoothstep(.62, .8, fbm2(fp * 2.3 + 3.)) * .08;
+    float foam = smoothstep(.62, .8, fbm2(fp * 2.3 + 3.)) * .08 * exp(-tFloor * .06);
     col = NAVY * .08 + refl * mix(.25, 1., fres) + mix(AQUA, ICE, .5) * foam * (.4 + shafts(p + vec3(0, .2, 0)));
   } else {
     col = sc;

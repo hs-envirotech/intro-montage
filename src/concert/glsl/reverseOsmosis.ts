@@ -172,15 +172,15 @@ void main(){
     float sparkle = step(.985, h21(sc)) * pow(fract(uGT * 1.3 + h21(sc + 4.)), 8.) * smoothstep(.35, .05, length(fract(P * 40.) - .5));
     float aa = smoothstep(.08, .01, px);          // detail fades out into the distance
     float a = SAT(.5 + .35 * r) * smoothstep(14., 3., dm);
-    vec3 mc = SLATE * (.25 + .9 * r * mix(.7, fine, aa));
-    mc += mix(AQUA, SEA, .35) * pow(1. - r, 2.) * .7 * (1. + uBeat);     // permeate light glowing through the valleys
+    vec3 mc = mix(SLATE, vec3(.2, .24, .27), .3) * (.12 + .8 * pow(r, 1.5) * mix(.7, fine, aa));
+    mc += mix(AQUA, SEA, .35) * pow(1. - r, 4.) * .22 * (1. + uBeat);     // permeate light glowing through the valleys
     mc += mix(AQUA, ICE, .6) * sparkle * 2.5 * aa;
-    mc = mix(mc, BLUE * .15 + AQUA * .08, 1. - exp(-Dm * .04));
+    mc = mix(mc, BLUE * .08 + AQUA * .02, 1. - exp(-Dm * .04));
     col = mix(col, mc, a);
     memTrans = 1. - a * .85;
   }
   // breakthrough
-  col += mix(AQUA, ICE, .7) * exp(-dm * dm * 5.) * 1.4;
+  col += mix(AQUA, ICE, .8) * exp(-dm * dm * 12.) * 1.1;
   // permeate: soft rays of light ahead
   if (after > 0.) {
     vec2 dirv = normalize(uv + 1e-4);
