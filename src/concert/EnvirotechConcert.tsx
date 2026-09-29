@@ -10,8 +10,8 @@ import { ProcessLabel } from "./ProcessLabel";
 export const concertSchema = z.object({
   /** Shader resolution as a fraction of the output (1 = full; 0.5 for fast previews). */
   shaderScale: z.number().min(0.25).max(1),
-  /** Show the brief process labels (ULTRAFILTRATION, REVERSE OSMOSIS, …). */
-  showLabels: z.boolean(),
+  /** Process labels: off, names only, or names with a one-line descriptor. */
+  labels: z.enum(["off", "names", "descriptors"]),
   /** Render a single shot on its own (for review); empty = the full loop. */
   only: z.string(),
   /** Include an original score (assets/concert_music/). */
@@ -58,7 +58,7 @@ const layersAt = (g: number, only: string): Layer[] => {
   return out;
 };
 
-export const EnvirotechConcert: React.FC<ConcertProps> = ({ shaderScale, showLabels, only, music, score }) => {
+export const EnvirotechConcert: React.FC<ConcertProps> = ({ shaderScale, labels, only, music, score }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const g = frame / fps;
@@ -96,11 +96,11 @@ export const EnvirotechConcert: React.FC<ConcertProps> = ({ shaderScale, showLab
           </AbsoluteFill>
         );
       })}
-      {showLabels && <ProcessLabel g={g} only={only} />}
+      <ProcessLabel g={g} only={only} mode={labels} />
       {music && !only && <Html5Audio src={staticFile(SCORES[score])} />}
     </AbsoluteFill>
   );
 };
 
-export const CONCERT_DEFAULTS: ConcertProps = { shaderScale: 1, showLabels: true, only: "", music: true, score: "electronic" };
+export const CONCERT_DEFAULTS: ConcertProps = { shaderScale: 1, labels: "descriptors", only: "", music: true, score: "electronic" };
 export { CONCERT };

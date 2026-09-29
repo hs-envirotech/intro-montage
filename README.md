@@ -124,7 +124,8 @@ Compositions:
 | `ConcertShots/Concert-<shot>` | 1920×1080 | one shot on its own, for review |
 
 Props (Studio props panel, or `--props`): `shaderScale` (1 = full resolution, 0.5 for fast drafts),
-`showLabels` (the four brief process labels; on by default), `only` (render one shot).
+`labels` (`"descriptors"` = process name plus a one-line plain-English description, the default;
+`"names"` = names only; `"off"`), `music` and `score` (see below), `only` (render one shot).
 
 **Render speed.** The scripts use `--gl=swangle` (software WebGL), which works on any machine,
 including servers without a GPU, but is slow: allow roughly 1–3 s per 1080p frame per CPU core.
@@ -182,7 +183,7 @@ src/concert/
   shots.ts               per-shot camera paths and shader parameters
   EnvirotechConcert.tsx  layers the shots, crossfades, loop wrap
   BrandReveal.tsx        particles sampled from the official logo
-  ProcessLabel.tsx       the brief, restrained process labels
+  ProcessLabel.tsx       process names and one-line descriptors (copy lives in timeline.ts)
   camera.ts              spline helpers
   gl/ShaderCanvas.tsx    WebGL2 full-frame shader layer
   glsl/                  one shader per environment, plus common.ts (palette, noise, film finish)
@@ -191,7 +192,10 @@ src/concert/
 The brand palette is defined once, in linear light, at the top of `glsl/common.ts`: Deep Navy
 `#0B2239` and Envirotech Blue `#21528A` carry the darkness, Slate `#4A5C6A` the steel, and Sea Green
 `#14B096` / Aqua `#16B1C4` are kept for water, light and energy. The only typography is the
-ENVIROTECH logo (from `assets/logo/`) and four optional process labels.
+ENVIROTECH logo (from `assets/logo/`) and the process labels. The labels name each stage and say in
+one plain line what it does, for audiences outside the water industry; the copy is in the `label`
+field of each shot in `src/concert/timeline.ts`. They appear after each environment has had a
+moment on its own, and the drop, the climax hit and the logo stay free of text.
 
 The facility, vessels and network are a stylised composite of modern water infrastructure, not any
 real Envirotech site.

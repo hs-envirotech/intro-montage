@@ -34,23 +34,34 @@ export type ShotSpec = {
   durationSec: number;
   /** Seconds this shot overlaps the previous one while it fades in. */
   fadeIn: number;
-  /** Optional process label, shown briefly and subtly. */
-  label?: string;
+  /** Optional process label: name, one-line plain-English descriptor, and when it appears (s into the shot). */
+  label?: ProcessLabelSpec;
 };
 
+export type ProcessLabelSpec = { name: string; text: string; at: number };
+
 export const SHOT_SPECS: ShotSpec[] = [
-  { id: "raw", title: "01 · Raw water", durationSec: 22, fadeIn: 0 },
-  { id: "screening", title: "02 · Screening", durationSec: 16, fadeIn: 1.6 },
-  { id: "coagulation", title: "03 · Coagulation", durationSec: 14, fadeIn: 1.0 },
-  { id: "ufField", title: "04 · UF membrane field", durationSec: 10, fadeIn: 1.2, label: "ULTRAFILTRATION" },
+  { id: "raw", title: "01 · Raw water", durationSec: 22, fadeIn: 0,
+    label: { name: "RAW WATER", text: "Untreated water from rivers, sea or industry", at: 8 } },
+  { id: "screening", title: "02 · Screening", durationSec: 16, fadeIn: 1.6,
+    label: { name: "SCREENING", text: "Bar screens remove debris and large solids", at: 2.5 } },
+  { id: "coagulation", title: "03 · Coagulation", durationSec: 14, fadeIn: 1.0,
+    label: { name: "COAGULATION", text: "Fine particles clump together so they can be removed", at: 2 } },
+  { id: "ufField", title: "04 · UF membrane field", durationSec: 10, fadeIn: 1.2,
+    label: { name: "ULTRAFILTRATION", text: "Hollow-fibre membranes filter out particles and bacteria", at: 1.4 } },
   { id: "ufFibre", title: "05 · Inside a hollow fibre", durationSec: 8, fadeIn: 0.8 },
   { id: "ufArray", title: "06 · UF array · build", durationSec: 6, fadeIn: 0.7 },
-  { id: "roRacks", title: "07 · RO pressure vessels · drop", durationSec: 16, fadeIn: 0.15, label: "REVERSE OSMOSIS" },
+  { id: "roRacks", title: "07 · RO pressure vessels · drop", durationSec: 16, fadeIn: 0.15,
+    label: { name: "REVERSE OSMOSIS", text: "High pressure pushes water through a membrane, leaving salts behind", at: 4 } },
   { id: "roMembrane", title: "08 · RO membrane boundary", durationSec: 16, fadeIn: 0.6 },
-  { id: "ionExchange", title: "09 · Ion exchange", durationSec: 16, fadeIn: 1.5, label: "DEMINERALISATION" },
-  { id: "polishing", title: "10 · Polishing", durationSec: 14, fadeIn: 2.0, label: "PURIFICATION" },
-  { id: "plant", title: "11 · Plant reveal · climax", durationSec: 26, fadeIn: 1.5 },
-  { id: "network", title: "12 · The network", durationSec: 14, fadeIn: 2.5 },
+  { id: "ionExchange", title: "09 · Ion exchange", durationSec: 16, fadeIn: 1.5,
+    label: { name: "DEMINERALISATION", text: "Ion-exchange resin captures the remaining dissolved minerals", at: 2 } },
+  { id: "polishing", title: "10 · Polishing", durationSec: 14, fadeIn: 2.0,
+    label: { name: "POLISHING", text: "Final purification to ultrapure standard", at: 2.5 } },
+  { id: "plant", title: "11 · Plant reveal · climax", durationSec: 26, fadeIn: 1.5,
+    label: { name: "CLEAN WATER", text: "Ready for industry, cities and reuse", at: 1.2 } },
+  { id: "network", title: "12 · The network", durationSec: 14, fadeIn: 2.5,
+    label: { name: "THE NETWORK", text: "Connected systems keep water supply resilient", at: 2.5 } },
   { id: "brand", title: "13 · Envirotech", durationSec: 16, fadeIn: 2.0 },
   { id: "return", title: "14 · Return to the source", durationSec: 10, fadeIn: 1.5 },
 ];
