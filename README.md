@@ -25,24 +25,34 @@ The first render downloads Remotion's own headless Chrome (about 100 MB). With a
 typically takes a few minutes; in software mode it can take about an hour. If `render:gpu` fails or
 gives black 3D frames on your machine, use `npm run render`.
 
-## Music
+## Music: "Confluence" (original score)
 
-To use your own track, drop an audio file (`.mp3`, `.wav`, `.m4a`, `.aac` or `.ogg`) into
-`assets/music/`. It is used in place of the temp score automatically, faded out over the last
-1.5 s. Set `ASSETS.musicStartSec` in `src/config.ts` to skip into the track, for example so its
-drop lands on the logo reveal at 54 s. The film's build follows this shape, so a track with a
-similar arc fits best:
+The film has its own score, composed and synthesised in code by `scripts/compose_score.mts`
+(`npm run score` rebuilds `assets/music/envirotech_score.wav`). It is original, so there are no
+licensing issues.
 
-| Time | Picture | Music |
+**Concept: tributaries joining into one river.** A single four-note motif, **D – A – E – F**, is
+born as the water droplet in the dark: the droplet sounds D, the ripple A, the rebound E, the
+settling F. Each movement then adds a voice built from that same motif:
+
+| Time | Picture | Score |
 |---|---|---|
-| 0–10 s | Droplet, underwater | Near silence, low atmosphere |
-| 10–25 s | Technology | Rhythm enters |
-| 25–40 s | Engineering, delivery | Builds |
-| 40–54 s | Projects, Silverstreams | Largest scale |
-| 54–60 s | Logo reveal | Sudden drop, one final impact, fade |
+| 0–7 s | Droplet, underwater | Low drone. The motif rings out as droplet and bell tones. A sub-bass pulse leads into the downbeat. |
+| 7–17 s | Technology | The motif becomes a flowing plucked arpeggio with a ping-pong echo, over soft pads and a light pulse. Hydraulic whooshes mark each process change (UF → RO → desalination → reclamation). |
+| 17–27 s | Engineering | Bass enters and the rhythm locks in. Steel impacts land on ENGINEER, INTEGRATE and DELIVER. |
+| 27–37 s | Delivery lifecycle | Four-on-the-floor pulse and rolling bass. An impact on each phase change (on the bar lines), then a bigger hit on EPCC · O&M · BOT. |
+| 37–47 s | Projects | A wide lead sings the motif slowly. Glassy ticks play the motif as the PRPC figures count up. A tom fill leads into the climax. |
+| 47–54 s | Silverstreams | The largest moment. The tempo pushes from 96 to ~103 BPM, layers double, and a riser and snare build run under the data-centre campus reveal. The harmony stays suspended (Dsus4) and never resolves. |
+| 54 s | The cut | Everything stops, and the reverb is gated too, so the silence is real. |
+| 56–60 s | Logo | Three bell notes, **D – A – E**, follow the aqua light tracing the logo. When the logo lands, the fourth note arrives transformed: **F becomes F♯**. The minor motif resolves to major only this once, with a single deep tonal impact under the slogan "Securing water for the next generation". |
 
-Use only music you have a licence for. The included `envirotech_temp_score.wav` is synthesised
-by `scripts/generate_temp_score.mts` (`npm run score`) and is for review only.
+Key D minor (Dorian colour), 96 BPM. One bar is 2.5 s (75 frames), so bar lines fall exactly on the
+scene boundaries at 7, 17, 27, 37 and 47 s. If you change scene lengths, keep scenes 2–5 at
+multiples of 2.5 s, or the script will stop with an error, then run `npm run score` again.
+
+**Using a different track:** drop any audio file (`.mp3`, `.wav`, `.m4a`, `.aac`, `.ogg`) into
+`assets/music/` and it replaces the score automatically, faded out over the last 1.5 s. Set
+`ASSETS.musicStartSec` in `src/config.ts` to skip into the track. Use only music you're licensed for.
 
 ## The film
 
@@ -105,25 +115,11 @@ There is no VO recording yet. The script and timings are in `VO` in `src/config.
 `showSubtitles` prop to review them. The reveal (54–60 s) is left without VO on purpose. If a line
 runs long when recorded, shorten the line rather than speeding up the delivery.
 
-## Sound
-
-With no track of your own, `assets/music/envirotech_temp_score.wav` is used. It is a **temp score**. It is synthesised by
-`scripts/generate_temp_score.mts` and locked to the scene timings:
-
-- 0–10 s: atmosphere, the droplet and a sub-bass pulse.
-- 10–25 s: the rhythm arrives, with hydraulic swells.
-- 25–40 s: a bass ostinato and mechanical impacts.
-- 40–54 s: the largest scale: pads, a faster pulse and a riser.
-- At 54 s: a sudden drop, then one deep tonal impact on the wordmark before the fade.
-
-Replace it with a composed or licensed track for release. The first audio file in `assets/music/`,
-alphabetically, is used. If you change the scene timings, run `npm run score` again.
-
 ## Project structure
 
 ```
 assets/            Remotion public dir: footage/, music/, fonts/ (Manrope, Source Sans 3), logo/
-scripts/           temp score generator
+scripts/           compose_score.mts: the original score "Confluence"
 src/config.ts      scene timings, VO, copy, verified project facts, footage slots
 src/theme.ts       palette (Deep Navy #0B2239 dominant), fonts, easing
 src/three/         3D toolkit: Stage, equipment (vessels, pumps, tanks, pipes, flows), plant, particles

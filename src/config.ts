@@ -122,11 +122,11 @@ export const SHOTS = {
 // ── Audio ────────────────────────────────────────────────────────────────────
 export const ASSETS = {
   /**
-   * Music: any track you drop into /assets/music is used in preference to the
-   * generated temp score (first alphabetically if there are several).
+   * Music: the original score "Confluence" (scripts/compose_score.mts). Any
+   * other track you drop into /assets/music is used in preference to it.
    */
   musicFolder: "music/",
-  tempScore: "music/envirotech_temp_score.wav",
+  generatedScore: "music/envirotech_score.wav",
   /** Skip into your track by this many seconds (e.g. to land its drop on the 54 s reveal). */
   musicStartSec: 0,
   /** Fade-out on the final beat. */

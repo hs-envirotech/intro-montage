@@ -3,10 +3,10 @@ import { Html5Audio, interpolate, useVideoConfig } from "remotion";
 import { ASSETS, sec } from "../config";
 import { resolveAudioIn } from "../assets";
 
-/** Your track in /assets/music (or the temp score), faded out on the final beat; silent if none. */
+/** Your track in /assets/music (or the generated score), faded out on the final beat; silent if none. */
 export const Music: React.FC = () => {
   const { durationInFrames } = useVideoConfig();
-  const src = resolveAudioIn(ASSETS.musicFolder, ASSETS.tempScore);
+  const src = resolveAudioIn(ASSETS.musicFolder, ASSETS.generatedScore);
   if (!src) return null;
   const fadeStart = durationInFrames - sec(ASSETS.musicFadeOutSec);
   return (

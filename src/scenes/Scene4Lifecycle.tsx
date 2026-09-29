@@ -11,12 +11,14 @@ import { annotationStyle, colors, ease, fonts } from "../theme";
 // One continuous tracking shot along the process direction. The plant itself
 // moves through the delivery lifecycle as the camera travels.
 const PHASES = [
-  { word: COPY.lifecycle[0], start: 0, end: 66 }, // Design: blueprint wireframe
-  { word: COPY.lifecycle[1], start: 66, end: 132 }, // Engineer: equipment becomes real
-  { word: COPY.lifecycle[2], start: 132, end: 198 }, // Build: pipework and structure installed
-  { word: COPY.lifecycle[3], start: 198, end: 300 }, // Operate: lit, monitored, flowing
+  { word: COPY.lifecycle[0], start: 0, end: 75 }, // Design: blueprint wireframe
+  { word: COPY.lifecycle[1], start: 75, end: 150 }, // Engineer: equipment becomes real
+  { word: COPY.lifecycle[2], start: 150, end: 225 }, // Build: pipework and structure installed
+  { word: COPY.lifecycle[3], start: 225, end: 300 }, // Operate: lit, monitored, flowing
 ];
-const MODELS_IN = 244;
+// Phases change on the score's bar lines (one bar = 75 frames at 96 BPM);
+// the delivery models land on beat 3 of the last bar.
+const MODELS_IN = 259;
 
 const CAMERA: CamKey[] = [
   { f: 0, pos: [-26, 8, 15], target: [-15, 1, 0], fov: 34 },
@@ -92,8 +94,8 @@ const LifecycleRow: React.FC<{ frame: number }> = ({ frame }) => {
 
 /** Minimal monitoring overlay for the OPERATE phase — status and trend, no figures. */
 const MonitorHud: React.FC<{ frame: number }> = ({ frame }) => {
-  const a = interpolate(frame, [206, 222, 286, 300], [0, 1, 1, 0.6], clamp);
-  const draw = prog(frame, 210, 290, ease.inOut);
+  const a = interpolate(frame, [230, 244, 290, 300], [0, 1, 1, 0.6], clamp);
+  const draw = prog(frame, 234, 296, ease.inOut);
   const pts = Array.from({ length: 60 })
     .map((_, i) => {
       const x = (i / 59) * 300;
@@ -117,7 +119,7 @@ const MonitorHud: React.FC<{ frame: number }> = ({ frame }) => {
     >
       <div style={{ ...annotationStyle, fontSize: 14, color: colors.aqua, marginBottom: 12 }}>System monitoring</div>
       {["Pretreatment", "UF", "RO", "Product water"].map((l, i) => {
-        const on = frame > 214 + i * 8 ? 1 : 0.25;
+        const on = frame > 236 + i * 6 ? 1 : 0.25;
         return (
           <div key={l} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
             <div style={{ width: 8, height: 8, borderRadius: 4, background: colors.seaGreen, opacity: on, boxShadow: on > 0.5 ? `0 0 8px ${colors.seaGreen}` : undefined }} />
@@ -137,12 +139,12 @@ export const Scene4Lifecycle: React.FC = () => {
   const frame = useCurrentFrame();
   const cam = cameraAt(frame, CAMERA, (t) => t * t * (3 - 2 * t));
 
-  const engineer = prog(frame, 66, 118, ease.inOut);
-  const build = prog(frame, 132, 196, (t) => t);
-  const operate = prog(frame, 198, 240, ease.inOut);
+  const engineer = prog(frame, 75, 127, ease.inOut);
+  const build = prog(frame, 150, 214, (t) => t);
+  const operate = prog(frame, 225, 262, ease.inOut);
 
   const wire = lerp(1, 0.12, engineer) * (1 - operate);
-  const grid = 1 - prog(frame, 100, 170);
+  const grid = 1 - prog(frame, 110, 180);
 
   return (
     <AbsoluteFill style={{ backgroundColor: colors.deepNavy }}>
