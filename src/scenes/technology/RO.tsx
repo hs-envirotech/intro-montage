@@ -12,7 +12,7 @@ export const RO_DURATION = 125;
 
 const CAMERA: CamKey[] = [
   // Macro on a pressure-vessel end cap, then a long crane move along the rack.
-  { f: 0, pos: [0.2, 2.6, 2.35], target: [0.9, 2.02, 1.375], fov: 26 },
+  { f: 0, pos: [4.3, 1.45, 2.9], target: [2.7, 1.2, 0.2], fov: 30 },
   { f: 42, pos: [6.8, 2.6, 5.2], target: [0.6, 1.2, 0], fov: 34 },
   { f: RO_DURATION, pos: [-5.2, 2.3, 8.2], target: [-0.3, 1.0, 0], fov: 36 },
 ];
