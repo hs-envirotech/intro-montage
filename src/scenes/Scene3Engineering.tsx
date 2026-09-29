@@ -9,11 +9,12 @@ import { colors, ease } from "../theme";
 
 // Individual technologies assemble into one engineered system; the camera
 // pulls back from equipment scale to plant scale to infrastructure scale.
+// Three bars (225 frames); each word lands on beat 2 of its bar.
 const CAMERA: CamKey[] = [
   { f: 0, pos: [9.5, 2.2, 8.5], target: [4.2, 1.1, 2.6], fov: 34 },
-  { f: 110, pos: [-6, 6.5, 17], target: [2, 1.2, 0], fov: 36 },
-  { f: 220, pos: [-20, 17, 32], target: [2, 0.5, 0], fov: 36 },
-  { f: 310, pos: [-30, 34, 50], target: [12, 0, 4], fov: 38 },
+  { f: 80, pos: [-6, 6.5, 17], target: [2, 1.2, 0], fov: 36 },
+  { f: 160, pos: [-20, 17, 32], target: [2, 0.5, 0], fov: 36 },
+  { f: 235, pos: [-30, 34, 50], target: [12, 0, 4], fov: 38 },
 ];
 
 export const PlantLights: React.FC<{ led?: number }> = ({ led = 0 }) => (
@@ -32,11 +33,11 @@ export const Scene3Engineering: React.FC = () => {
   const frame = useCurrentFrame();
   const cam = cameraAt(frame, CAMERA);
   // Opens with the RO trains already in place (continuity from the RO shot); the rest assembles around them.
-  const equipment = lerp(0.2, 1, prog(frame, 0, 170, (t) => t));
-  const pipes = prog(frame, 50, 210, (t) => t);
-  const building = prog(frame, 170, 240, ease.out);
-  const flow = prog(frame, 150, 270, ease.inOut);
-  const context = prog(frame, 200, 280);
+  const equipment = lerp(0.2, 1, prog(frame, 0, 125, (t) => t));
+  const pipes = prog(frame, 36, 150, (t) => t);
+  const building = prog(frame, 120, 175, ease.out);
+  const flow = prog(frame, 105, 200, ease.inOut);
+  const context = prog(frame, 145, 210);
 
   return (
     <AbsoluteFill style={{ backgroundColor: colors.deepNavy }}>
@@ -51,9 +52,9 @@ export const Scene3Engineering: React.FC = () => {
           context={context}
         />
       </Stage>
-      <BeatWord word={COPY.engineering[0]} frame={frame} start={36} end={104} />
-      <BeatWord word={COPY.engineering[1]} frame={frame} start={112} end={180} />
-      <BeatWord word={COPY.engineering[2]} frame={frame} start={188} end={256} />
+      <BeatWord word={COPY.engineering[0]} frame={frame} start={19} end={82} />
+      <BeatWord word={COPY.engineering[1]} frame={frame} start={94} end={157} />
+      <BeatWord word={COPY.engineering[2]} frame={frame} start={169} end={228} />
       <Vignette />
     </AbsoluteFill>
   );

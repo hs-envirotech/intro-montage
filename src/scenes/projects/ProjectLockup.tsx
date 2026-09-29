@@ -55,7 +55,7 @@ export const lineStyle: React.CSSProperties = {
 
 /** Honest caption for procedural or illustrative imagery. */
 export const IllustrativeTag: React.FC<{ text: string }> = ({ text }) => (
-  <div style={{ ...annotationStyle, fontSize: 13, position: "absolute", right: 48, bottom: 150, color: "rgba(255,255,255,0.45)" }}>
+  <div style={{ ...annotationStyle, fontSize: 13, position: "absolute", right: 48, bottom: 40, color: "rgba(255,255,255,0.45)" }}>
     {text}
   </div>
 );

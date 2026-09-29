@@ -37,17 +37,18 @@ settling F. Each movement then adds a voice built from that same motif:
 
 | Time | Picture | Score |
 |---|---|---|
-| 0–7 s | Droplet, underwater | Low drone. The motif rings out as droplet and bell tones. A sub-bass pulse leads into the downbeat. |
-| 7–17 s | Technology | The motif becomes a flowing plucked arpeggio with a ping-pong echo, over soft pads and a light pulse. Hydraulic whooshes mark each process change (UF → RO → desalination → reclamation). |
-| 17–27 s | Engineering | Bass enters and the rhythm locks in. Steel impacts land on ENGINEER, INTEGRATE and DELIVER. |
-| 27–37 s | Delivery lifecycle | Four-on-the-floor pulse and rolling bass. An impact on each phase change (on the bar lines), then a bigger hit on EPCC · O&M · BOT. |
-| 37–47 s | Projects | A wide lead sings the motif slowly. Glassy ticks play the motif as the PRPC figures count up. A tom fill leads into the climax. |
-| 47–54 s | Silverstreams | The largest moment. The tempo pushes from 96 to ~103 BPM, layers double, and a riser and snare build run under the data-centre campus reveal. The harmony stays suspended (Dsus4) and never resolves. |
-| 54 s | The cut | Everything stops, and the reverb is gated too, so the silence is real. |
-| 56–60 s | Logo | Three bell notes, **D – A – E**, follow the aqua light tracing the logo. When the logo lands, the fourth note arrives transformed: **F becomes F♯**. The minor motif resolves to major only this once, with a single deep tonal impact under the slogan "Securing water for the next generation". |
+| 0–7 s | Droplet, underwater | Low drone. The motif rings out as droplet and bell tones. A sub-bass pulse and two taiko hits lead into the downbeat. |
+| 7–17 s | Technology | A braam and taiko open the section. Driving low string 8ths, bass pulse and a plucked motif arpeggio with echo. Hydraulic whooshes mark each process change (UF → RO → desalination → reclamation). |
+| 17–24.5 s | Engineering | Full backbeat and taiko. The motif becomes a 16th-note string ostinato. Steel impacts land on ENGINEER, INTEGRATE and DELIVER. |
+| 24.5–34.5 s | Delivery lifecycle | Four-on-the-floor, rolling bass and a taiko ensemble. A braam and impact on each phase change (on the bar lines), then a bigger hit on EPCC · O&M · BOT. |
+| 34.5–37 s | Industries | A bell tick for each sector as it appears, and a taiko roll building into the projects. |
+| 37–47 s | Projects | Choir enters. A wide lead sings the motif over the strings. Glassy ticks play the motif as the PRPC figures count up. A taiko and tom fill leads into the climax. |
+| 47–54 s | Silverstreams | The largest moment. The tempo pushes from 96 to ~103 BPM, taiko go to full 16ths, a braam hits every bar, and a riser and snare build run under the data-centre campus reveal. The harmony stays suspended (Dsus4) and never resolves. |
+| 54 s | The cut | Everything stops. Reverb and echoes are gated too, so the silence is real (below −60 dB within a tenth of a second). |
+| 56–60 s | Logo | Three bell notes, **D – A – E**, follow the aqua light tracing the logo. When the logo lands, the fourth note arrives transformed: **F becomes F♯**. The minor motif resolves to major only this once, with one deep impact (taiko, boom and a D-major braam) and a soft choir under the slogan "Securing water for the next generation". |
 
 Key D minor (Dorian colour), 96 BPM. One bar is 2.5 s (75 frames), so bar lines fall exactly on the
-scene boundaries at 7, 17, 27, 37 and 47 s. If you change scene lengths, keep scenes 2–5 at
+scene boundaries at 7, 17, 24.5, 34.5, 37 and 47 s. If you change scene lengths, keep scenes 2–6 at
 multiples of 2.5 s, or the script will stop with an error, then run `npm run score` again.
 
 **Using a different track:** drop any audio file (`.mp3`, `.wav`, `.m4a`, `.aac`, `.ogg`) into
@@ -60,11 +61,12 @@ multiples of 2.5 s, or the script will stop with an error, then run `npm run sco
 |---|---|---|
 | 0–7 s | 1 · Water / origin | Darkness, then a rim-lit droplet falls in slow motion onto still water. The ripple spreads, the camera dives under the surface, and suspended particles organise into membrane fibres. "WATER". |
 | 7–17 s | 2 · Water technology | **UF**: a hollow fibre retains solids while permeate passes. **RO** (centrepiece): the pressure-vessel rack, high-pressure pump, and feed, permeate and concentrate flows. **Desalination**: a seawater intake leading to a coastal plant. **Water reclamation**: raw water → treatment → purified water → reuse. |
-| 17–27 s | 3 · Technology to engineering | Equipment assembles outward from the RO trains into one integrated plant. Water flows through the whole system as the camera pulls back to infrastructure scale. ENGINEER · INTEGRATE · DELIVER. |
-| 27–37 s | 4 · Engineering through operation | One continuous tracking shot. The plant moves from DESIGN (blueprint) → ENGINEER → BUILD → OPERATE (lit, flowing, monitored), then resolves to EPCC · O&M · BOT. |
-| 37–47 s | 5 · Project experience | **EMAS Project**, PMC, MRCSB. Then **PRPC UF**, Pengerang, Johor, portable demineralised water treatment, with its delivered figures counting up. |
-| 47–54 s | 6 · Silverstreams | A fenced DAF → UF → RO compound, then a crane move up to the data-centre campus it will supply. SILVERSTREAMS · AWARDED CONCESSION · 4 MLD SWRO desalination plant · 20+10-year BOT concession. |
-| 54–60 s | 7 · Reveal | The systems become one network, pull back and fall into darkness. An aqua light traces the **official Envirotech logo**, then the slogan "Securing water for the next generation" appears. It holds, then fades to black. |
+| 17–24.5 s | 3 · Technology to engineering | Equipment assembles outward from the RO trains into one integrated plant. Water flows through the whole system as the camera pulls back to infrastructure scale. ENGINEER · INTEGRATE · DELIVER. |
+| 24.5–34.5 s | 4 · Engineering through operation | One continuous tracking shot. The plant moves from DESIGN (blueprint) → ENGINEER → BUILD → OPERATE (lit, flowing, monitored), then resolves to EPCC · O&M · BOT. |
+| 34.5–37 s | 5 · Industries we serve | A quick glance: Data centres · Oil, gas & petrochemical · Industrial & process · Municipal water · Desalination · Reuse & ZLD, as brand icon chips. |
+| 37–47 s | 6 · Project experience | **EMAS Project**, PMC, MRCSB. Then **PRPC UF**, Pengerang, Johor: a simplified process flow drawn from the project P&ID (multimedia filtration ×8 → 1st-pass RO ×3 → break tanks → 2nd-pass RO ×3 → mixed-bed polishing ×5 → demin water supply), with the delivered figures counting up. |
+| 47–54 s | 7 · Silverstreams | A fenced DAF → UF → RO compound, then a crane move up to the data-centre campus it will supply. SILVERSTREAMS · AWARDED CONCESSION · 4 MLD SWRO desalination plant · 20+10-year BOT concession. |
+| 54–60 s | 8 · Reveal | The systems become one network, pull back and fall into darkness. An aqua light traces the **official Envirotech logo**, then the slogan "Securing water for the next generation" appears. It holds, then fades to black. |
 
 The camera language recurs throughout, moving from micro to equipment, plant, infrastructure,
 campus and network. Each movement pushes through into the next rather than cutting like a
@@ -79,7 +81,10 @@ All project facts live in `PROJECTS` in `src/config.ts`, and **only** those fact
 - **PRPC UF**: Pengerang, Johor · portable demineralised water treatment · ultrapure, low-silica
   water · design, supply, install, commission, O&M · 1.47 million m³ delivered · 3.6 MLD design
   capacity (150 m³/hr) · 4.0 MLD peak (167 m³/hr) · 24/7 operations. These figures come from
-  Envirotech's PRPC project spotlight.
+  Envirotech's PRPC project spotlight. The process flow follows the project's P&ID
+  (HSE-PRPC-PRO-PID-001C) and plant layout (HSE-PRPC-PRO-LYT-001B). It is vendor-neutral:
+  "double-pass RO", with no contractor or technology-partner names. In "PRPC UF", UF is the
+  client, PRPC Utilities & Facilities, not ultrafiltration.
 - **Silverstreams**: 4 MLD SWRO desalination plant (DAF → UF → RO) · 20+10-year BOT concession ·
   **awarded**. It is never labelled completed or operational, and its water routes are drawn as
   planned alignments, with no moving flow.

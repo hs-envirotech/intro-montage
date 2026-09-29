@@ -101,17 +101,18 @@ const WaterSurface: React.FC<{ frame: number; below: boolean }> = ({ frame, belo
 
 // ── Droplet ─────────────────────────────────────────────────────────────────
 const sphereGeo = new THREE.SphereGeometry(1, 16, 12);
+// A real falling drop is nearly spherical (surface tension), not a teardrop:
+// a sphere, very slightly flattened underneath, with no point.
+const DROP_R = 0.06;
 const dropGeometry = (() => {
   const pts: THREE.Vector2[] = [];
-  for (let i = 0; i <= 40; i++) {
-    const t = i / 40;
-    const a = t * Math.PI;
-    // Teardrop profile: round bottom, gently pointed top.
-    const r = Math.sin(a) * (0.5 + 0.5 * (1 - t)) * 0.06 * (1 - 0.35 * t * t);
-    const y = -Math.cos(a) * 0.075 + t * t * 0.03;
+  for (let i = 0; i <= 48; i++) {
+    const a = (i / 48) * Math.PI;
+    const r = Math.sin(a) * DROP_R;
+    const y = -Math.cos(a) * DROP_R * (Math.cos(a) > 0 ? 0.93 : 1);
     pts.push(new THREE.Vector2(Math.max(0.0001, r), y));
   }
-  return new THREE.LatheGeometry(pts, 48);
+  return new THREE.LatheGeometry(pts, 64);
 })();
 
 /** Fresnel rim: bright at grazing angles, like a rim-lit drop against black. */
@@ -146,7 +147,7 @@ const Droplet: React.FC<{ y: number; stretch: number; scale?: number; opacity?: 
     <meshPhysicalMaterial color="#0A2A36" roughness={0} metalness={0} clearcoat={1} clearcoatRoughness={0} transparent opacity={0.55 * opacity} depthWrite={false} />
   </mesh>
   {/* Focused light inside the lower drop: the caustic a real droplet forms */}
-  <mesh position={[0.01, -0.045, 0.062]}>
+  <mesh position={[0.01, -0.03, 0.058]}>
     <planeGeometry args={[0.07, 0.035]} />
     <meshBasicMaterial map={getSprite()} color="#BDEFF6" transparent opacity={0.6 * opacity} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
   </mesh>
@@ -214,7 +215,7 @@ const Rebound: React.FC<{ frame: number }> = ({ frame }) => {
           <meshPhysicalMaterial color="#FFFFFF" transmission={1} roughness={0} ior={1.33} thickness={0.03} attenuationColor={colors.aqua} attenuationDistance={0.3} />
         </mesh>
       )}
-      {dropT > 0 && dropY > 0 && frame < REBOUND_IMPACT && <Droplet y={dropY} stretch={1.05} scale={0.32} />}
+      {dropT > 0 && dropY > 0 && frame < REBOUND_IMPACT && <Droplet y={dropY} stretch={1} scale={0.32} />}
     </group>
   );
 };
@@ -282,7 +283,7 @@ export const Scene1Origin: React.FC = () => {
   const frame = useCurrentFrame();
   // Slow-motion fall: long hang, then gravity.
   const fall = prog(frame, FALL, IMPACT, ease.in);
-  const dropY = lerp(DROP_START_Y, 0.07, fall);
+  const dropY = lerp(DROP_START_Y, DROP_R * 0.93, fall);
 
   const path = cameraAt(frame, CAMERA);
   // While the drop falls, the lens tilts with it (a slightly lagging follow-focus move).
@@ -330,7 +331,7 @@ export const Scene1Origin: React.FC = () => {
           {/* Rim light just behind the falling drop */}
           {frame < IMPACT && <pointLight position={[0.05, dropY + 0.12, -0.5]} intensity={1.6 * dropLight} color="#DDF7FA" distance={1.4} />}
           <WaterSurface frame={frame} below={below} />
-          {dropVisible && <Droplet y={dropY} stretch={1 + fall * 0.25} opacity={dropLight} />}
+          {dropVisible && <Droplet y={dropY} stretch={1 + fall * 0.04} opacity={dropLight} />}
           <Splash frame={frame} />
           <Rebound frame={frame} />
 

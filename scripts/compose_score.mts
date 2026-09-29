@@ -36,6 +36,7 @@ const S = {
   tech: sceneAt("technology"),
   eng: sceneAt("engineering"),
   life: sceneAt("lifecycle"),
+  ind: sceneAt("industries"),
   proj: sceneAt("projects"),
   silver: sceneAt("silverstreams"),
   reveal: sceneAt("reveal"),
@@ -47,7 +48,7 @@ const SYNC = {
   rebound: F(138), // Scene1Origin REBOUND_IMPACT
   dive: F(150), // Scene1Origin DIVE start
   techCuts: [82, 197, 249].map((f) => S.tech + F(f + 5)), // UF→RO→Desal→Reclamation, mid push-through
-  sceneCuts: [S.eng, S.life, S.proj, S.silver].map((t) => t + F(5)),
+  sceneCuts: [S.eng, S.life, S.ind, S.proj, S.silver].map((t) => t + F(5)),
   prpc: S.proj + F(150), // EMAS → PRPC UF
   stats: [0, 1, 2, 3].map((i) => S.proj + F(150 + 40 + i * 12)), // PRPC figures start counting
   campus: S.silver + F(140), // data-centre campus callout
@@ -79,7 +80,7 @@ const q16 = (t: number) => {
 };
 
 // Sections by bar index
-const SEC = { tech: [0, 4], eng: [4, 8], life: [8, 12], proj: [12, 16], silver: [16, 19] } as const;
+const SEC = { tech: [0, 4], eng: [4, 7], life: [7, 11], ind: [11, 12], proj: [12, 16], silver: [16, 19] } as const;
 const inSec = (b: number, s: readonly [number, number]) => b >= s[0] && b < s[1];
 
 // ── Harmony ─────────────────────────────────────────────────────────────────
@@ -101,8 +102,9 @@ const CH: Record<string, Chord> = {
 // One entry per bar; two chords = first half / second half.
 const PROG: (keyof typeof CH)[][] = [
   ["Dm9"], ["Bbmaj7"], ["Fadd9"], ["C69"], // technology
-  ["Dm9"], ["Bbmaj7"], ["Gm9"], ["Asus4", "A"], // engineering
+  ["Dm9"], ["Bbmaj7"], ["Gm9", "A"], // engineering
   ["Dm9"], ["FC"], ["Bbmaj7"], ["C69"], // engineering → operation
+  ["Asus4", "A"], // industries — tension before the proof
   ["Bbmaj7"], ["Fadd9"], ["Gm9"], ["Asus4", "A"], // project experience
   ["Bbmaj7"], ["C69"], ["Dsus4"], // Silverstreams: suspended, never resolved… until the logo
 ];
@@ -125,7 +127,7 @@ const mtof = (m: number) => 440 * 2 ** ((m - 69) / 12);
 
 // Intensity curve: sets pad brightness and level through the film.
 const INTENSITY: [number, number][] = [
-  [0, 0.1], [S.tech, 0.32], [S.eng, 0.48], [S.life, 0.64], [S.proj, 0.8], [S.silver, 0.92], [S.reveal - 0.01, 1], [S.reveal, 0.2],
+  [0, 0.1], [S.tech, 0.45], [S.eng, 0.6], [S.life, 0.72], [S.ind, 0.74], [S.proj, 0.86], [S.silver, 1], [S.reveal - 0.01, 1], [S.reveal, 0.25],
 ];
 const intensity = (t: number) => {
   for (let i = INTENSITY.length - 1; i >= 0; i--) {
@@ -592,6 +594,110 @@ const swellInto = (to: number, len: number, notes: number[], gain: number) => {
   });
 };
 
+// ── Cinematic layer ─────────────────────────────────────────────────────────
+
+/** Taiko: deep drum body with a pitch drop, skin slap, big room. The cinematic heartbeat. */
+const taiko = (at: number, gain: number, pitch = 1, pan = 0) => {
+  const f0 = 60 * pitch;
+  const skin = new SVF();
+  voice(
+    at,
+    1.6,
+    (t) => {
+      const ph = TAU * (f0 * t + (f0 * 0.9 * (1 - Math.exp(-t * 18))) / 18);
+      const body = Math.sin(ph) * Math.exp(-t * 3.4) * Math.min(1, t * 700);
+      skin.run(noise(), 850 * pitch, 0.9);
+      return Math.tanh(body * 1.8) * 0.9 + skin.band * Math.exp(-t * 28) * 0.8;
+    },
+    { gain, pan, rev: 0.5 },
+  );
+};
+
+/** Braam: a wall of low, saturated brass-like saws whose filter blasts open then settles. */
+const braam = (at: number, dur: number, root: number, gain: number, major = false) => {
+  const notes = [root - 12, root, root + 7, root + 12, ...(major ? [root + 16] : [])];
+  notes.forEach((n, k) => {
+    const f = mtof(n);
+    const oscs = [new Saw(), new Saw(), new Saw()];
+    const det = [0.992, 1, 1.008];
+    const flt = new SVF();
+    voice(
+      at,
+      dur,
+      (t) => {
+        const env = Math.min(1, t / 0.04) * (0.5 + 0.5 * Math.exp(-t * 1.8)) * Math.min(1, (dur - t) / 0.5);
+        let x = 0;
+        for (let j = 0; j < 3; j++) x += oscs[j].next(f * det[j]);
+        const fc = 220 + 2600 * Math.exp(-t * 2.4) * Math.min(1, t / 0.1);
+        return Math.tanh(flt.run(x / 3, fc, 1.2) * 2.4) * env;
+      },
+      { gain: gain / Math.sqrt(notes.length), pan: k === 0 ? 0 : k % 2 ? 0.3 : -0.3, rev: 0.45 },
+    );
+  });
+};
+
+/** Spiccato strings: short, bowed, driving 8ths and 16ths. */
+const spiccato = (at: number, midi: number, gain: number, pan: number) => {
+  const f = mtof(midi);
+  const a = new Saw();
+  const b = new Saw();
+  const flt = new SVF();
+  const bow = new SVF();
+  voice(
+    at,
+    0.3,
+    (t) => {
+      const e = Math.min(1, t / 0.006) * Math.exp(-t * 12);
+      const x = (a.next(f * 0.997) + b.next(f * 1.003)) * 0.5;
+      bow.run(noise(), 3200, 0.7);
+      return flt.run(x + bow.band * 0.08, 1300 + 2400 * Math.exp(-t * 16), 0.9) * e;
+    },
+    { gain, pan, rev: 0.32, duck: true },
+  );
+};
+
+/** Choir "ah": saws through three vowel formants, with slow vibrato. */
+const choir = (at: number, held: number, notes: number[], gain: number) =>
+  notes.forEach((n, k) => {
+    const f = mtof(n);
+    const o = [new Saw(), new Saw()];
+    const f1 = new SVF();
+    const f2 = new SVF();
+    const f3 = new SVF();
+    voice(
+      at,
+      held + 1,
+      (t) => {
+        const e = gateEnv(t, held, 0.45, 1);
+        if (e <= 0) return 0;
+        const vib = 1 + 0.005 * Math.sin(TAU * 5 * t + k);
+        const x = (o[0].next(f * vib * 0.996) + o[1].next(f * vib * 1.004)) * 0.5;
+        f1.run(x, 760, 5);
+        f2.run(x, 1150, 6);
+        f3.run(x, 2650, 8);
+        return (f1.band + f2.band * 0.7 + f3.band * 0.3) * e * 2.2;
+      },
+      { gain: gain / Math.sqrt(notes.length), pan: -0.5 + k / Math.max(1, notes.length - 1), rev: 0.75 },
+    );
+  });
+
+const subDrop = (at: number, gain: number) =>
+  voice(at, 2.2, (t) => Math.sin(TAU * (mtof(26) * t + (40 * (1 - Math.exp(-t * 3))) / 3)) * Math.exp(-t * 1.5) * Math.min(1, t * 300), { gain });
+
+const reverseCymbal = (to: number, len: number, gain: number) => {
+  const f = new SVF();
+  voice(
+    to - len,
+    len,
+    (t) => {
+      const p = (t / len) ** 3;
+      f.run(noise(), 7000, 0.7);
+      return [f.high * p, f.band * p * 0.8];
+    },
+    { gain, rev: 0.3 },
+  );
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ARRANGEMENT
 // ─────────────────────────────────────────────────────────────────────────────
@@ -604,55 +710,85 @@ bell(SYNC.impact + 0.62, MOTIF[1], 0.1, -0.35); // A — the ripple spreading
 droplet(SYNC.rebound, MOTIF[2] + 12, 0.2, 0.25); // the rebound droplet sounds E
 bell(SYNC.rebound + 0.01, MOTIF[2], 0.09, 0.35);
 bell(SYNC.rebound + 0.64, MOTIF[3], 0.09, 0); // F — the motif is complete
-whoosh(SYNC.dive + 0.6, 1.6, 0.16, -1); // diving through the surface
-subPulse(S.tech - 2.5, 0.28); // a pulse begins…
-subPulse(S.tech - 1.25, 0.34);
-swellInto(S.tech, 1.6, [50, 57, 62, 65], 0.1);
+whoosh(SYNC.dive + 0.6, 1.6, 0.18, -1); // diving through the surface
+subPulse(S.tech - 2.5, 0.3); // a pulse begins…
+subPulse(S.tech - 1.25, 0.36);
+taiko(S.tech - 0.625, 0.22, 0.8);
+taiko(S.tech - 0.3125, 0.28, 0.8);
+swellInto(S.tech, 1.6, [50, 57, 62, 65], 0.12);
+reverseCymbal(S.tech, 1.4, 0.14);
 
-// 7–54 s · the bar-by-bar arrangement
+const MASKS = {
+  mid: [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0],
+  full: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+};
+const LEAD: Record<number, [number, number][]> = {
+  12: [[74, 1]], // D over B♭
+  13: [[81, 1]], // A over F
+  14: [[76, 0.5], [77, 0.5]], // E F over Gm
+  15: [[76, 1]], // E over A
+  16: [[74, 0.5], [77, 0.5]], // D F over B♭
+  17: [[76, 0.5], [79, 0.5]], // E G over C
+  18: [[81, 1]], // A, suspended over Dsus4 — held, unresolved, cut
+};
+
+// 7–54 s · bar by bar
 for (let b = 0; b < bars.length; b++) {
   const { t, len } = bars[b];
   const p = PROG[b];
   const I = intensity(t + 0.1);
+  const tech = inSec(b, SEC.tech);
+  const eng = inSec(b, SEC.eng);
+  const life = inSec(b, SEC.life);
+  const ind = inSec(b, SEC.ind);
+  const proj = inSec(b, SEC.proj);
+  const silver = inSec(b, SEC.silver);
+  const root = (at: number) => chordAt(at + 0.001).bass;
 
-  // Pads — every section
-  const halves = p.length;
-  for (let h = 0; h < halves; h++) {
+  // Pads, and choir from the projects onward
+  for (let h = 0; h < p.length; h++) {
     const ch = CH[p[h]];
-    const at = t + (h * len) / halves;
-    const held = len / halves;
-    const lvl = inSec(b, SEC.tech) ? 0.09 : inSec(b, SEC.silver) ? 0.15 : 0.12;
-    pad(at, held, ch.pad, lvl, { attack: b === 0 && h === 0 ? 0.02 : 0.18, release: 0.7 });
-    if (inSec(b, SEC.silver)) pad(at, held, ch.pad.map((n) => n + 12), 0.05, { attack: 0.3, release: 0.6, bright: 0.1 });
+    const at = t + (h * len) / p.length;
+    const held = len / p.length;
+    pad(at, held, ch.pad, tech ? 0.09 : silver ? 0.15 : 0.12, { attack: b === 0 && h === 0 ? 0.02 : 0.16, release: 0.7 });
+    if (silver) pad(at, held, ch.pad.map((n) => n + 12), 0.05, { attack: 0.3, release: 0.6, bright: 0.1 });
+    if (proj || silver) choir(at, held, ch.pad.slice(1, 5).map((n) => n + 12), silver ? 0.1 : 0.06);
   }
 
   // Flow arpeggio — the motif, as 16th-note plucks, fitted to each chord
-  const MASKS = {
-    sparse: [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
-    mid: [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0],
-    full: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  };
-  const mask = inSec(b, SEC.tech) ? MASKS.sparse : inSec(b, SEC.eng) ? MASKS.mid : MASKS.full;
+  const mask = tech ? MASKS.mid : MASKS.full;
   let k = b * 16;
   for (let s = 0; s < 16; s++) {
     if (!mask[s]) continue;
     const at = six(b, s);
-    const ch = chordAt(at + 0.001);
-    let m = snap(MOTIF[k % 4], ch);
-    if (!inSec(b, SEC.tech) && Math.floor(k / 4) % 2 === 1) m -= 12; // later: octave shadow
-    const accent = s % 4 === 0 ? 1 : 0.7;
-    pluck(at, m, 0.2 * accent * (0.8 + 0.4 * I), s % 2 ? 0.45 : -0.45, 0.35 + 0.5 * I);
+    let m = snap(MOTIF[k % 4], chordAt(at + 0.001));
+    if (!tech && Math.floor(k / 4) % 2 === 1) m -= 12;
+    pluck(at, m, 0.17 * (s % 4 === 0 ? 1 : 0.7) * (0.8 + 0.4 * I), s % 2 ? 0.45 : -0.45, 0.35 + 0.5 * I);
     k++;
   }
 
-  // Bass
-  const root = (at: number) => chordAt(at + 0.001).bass;
-  if (inSec(b, SEC.tech) && b >= 2) bass(t, len - 0.05, root(t), 0.22, 0.1);
-  if (inSec(b, SEC.eng)) {
-    const PAT = [0, 0, 12, 0, 0, 12, 0, 7];
-    for (let e = 0; e < 8; e++) bass(t + (e * len) / 8, len / 8 - 0.03, root(t + (e * len) / 8) + PAT[e], 0.23, 0.5);
+  // Strings: driving low 8ths throughout; the motif as 16th spiccato from engineering on
+  const LOW = [24, 24, 31, 24, 36, 24, 31, 24];
+  for (let e = 0; e < 8; e++) {
+    const at = t + (e * len) / 8;
+    spiccato(at, root(at) + LOW[e], (tech ? 0.1 : 0.13) * (e % 2 ? 0.75 : 1), -0.2);
   }
-  if (inSec(b, SEC.life) || inSec(b, SEC.proj) || inSec(b, SEC.silver)) {
+  if (!tech) {
+    for (let s = 0; s < 16; s++) {
+      const at = six(b, s);
+      const m = snap(MOTIF[s % 4] - 12, chordAt(at + 0.001)) + (silver && s % 8 >= 4 ? 12 : 0);
+      spiccato(at, m, (ind ? 0.06 + (s / 16) * 0.08 : 0.1) * (s % 4 === 0 ? 1 : 0.7), 0.35);
+    }
+  }
+
+  // Bass
+  if (tech || eng) {
+    const PAT = [0, 0, 12, 0, 0, 12, 0, 7];
+    for (let e = 0; e < 8; e++) {
+      const at = t + (e * len) / 8;
+      bass(at, len / 8 - 0.03, root(at) + PAT[e], tech ? 0.17 : 0.23, tech ? 0.3 : 0.5);
+    }
+  } else {
     const GALLOP = [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0];
     for (let s = 0; s < 16; s++) {
       if (!GALLOP[s]) continue;
@@ -662,83 +798,109 @@ for (let b = 0; b < bars.length; b++) {
   }
 
   // Drums
-  if (inSec(b, SEC.tech)) {
-    kick(t, 0.5, 0.3);
-    if (b >= 1) kick(beat(b, 2), 0.42, 0.3);
-    if (b >= 1) for (let s = 0; s < 16; s++) shaker(six(b, s), s % 4 === 2 ? 0.07 : 0.035, s % 2 ? 0.3 : -0.3);
+  if (tech) {
+    kick(t, 0.55, 0.35);
+    kick(beat(b, 2), 0.5, 0.35);
+    if (b % 2) kick(six(b, 14), 0.35, 0.2);
+    for (let s = 0; s < 16; s++) shaker(six(b, s), s % 4 === 2 ? 0.08 : 0.04, s % 2 ? 0.3 : -0.3);
+    for (let e = 1; e < 8; e += 2) hat(t + (e * len) / 8, 0.06, 0.25);
+    taiko(t, b === 0 ? 0.55 : 0.38, 0.9);
+    taiko(six(b, 6), 0.22, 1.2, 0.3);
+    taiko(beat(b, 2), 0.3, 1);
   }
-  if (inSec(b, SEC.eng)) {
-    kick(t, 0.62);
-    kick(beat(b, 2), 0.58);
-    if (b % 2 === 1) kick(six(b, 7), 0.4);
-    clap(beat(b, 1), 0.2);
-    clap(beat(b, 3), 0.2);
-    for (let e = 0; e < 8; e++) hat(t + (e * len) / 8, e % 2 ? 0.07 : 0.045, 0.25);
+  if (eng || ind) {
+    kick(t, 0.66);
+    kick(six(b, 6), 0.45);
+    kick(beat(b, 2), 0.62);
+    clap(beat(b, 1), 0.22);
+    clap(beat(b, 3), 0.22);
+    snare(beat(b, 1), 0.1);
+    snare(beat(b, 3), 0.1);
+    for (let s = 0; s < 16; s++) hat(six(b, s), s % 2 ? 0.06 : 0.04, 0.25);
+    taiko(t, 0.42, 0.9);
+    taiko(beat(b, 2), 0.36, 1.1, -0.3);
   }
-  if (inSec(b, SEC.life) || inSec(b, SEC.proj) || inSec(b, SEC.silver)) {
-    const big = inSec(b, SEC.silver);
-    for (let q = 0; q < 4; q++) kick(beat(b, q), big ? 0.66 : 0.58);
-    if (big) kick(six(b, 7), 0.45);
-    clap(beat(b, 1), big ? 0.27 : 0.23);
-    clap(beat(b, 3), big ? 0.27 : 0.23);
-    if (big || inSec(b, SEC.proj)) {
-      snare(beat(b, 1), 0.12);
-      snare(beat(b, 3), 0.12);
-    }
+  if (life || proj || silver) {
+    for (let q = 0; q < 4; q++) kick(beat(b, q), silver ? 0.66 : 0.6);
+    if (silver || proj) kick(six(b, 7), 0.4);
+    clap(beat(b, 1), silver ? 0.27 : 0.23);
+    clap(beat(b, 3), silver ? 0.27 : 0.23);
+    snare(beat(b, 1), silver ? 0.15 : 0.11);
+    snare(beat(b, 3), silver ? 0.15 : 0.11);
     for (let s = 0; s < 16; s++) hat(six(b, s), s % 4 === 2 ? 0.075 : s % 2 ? 0.05 : 0.035, s % 2 ? 0.3 : -0.2);
-    if (b >= SEC.life[0] + 2) for (let q = 0; q < 4; q++) hat(beat(b, q + 0.5), 0.05, 0.1, true);
+    for (let q = 0; q < 4; q++) hat(beat(b, q + 0.5), 0.05, 0.1, true);
+    // Taiko ensemble: 8ths, low/high alternating; full 16ths through Silverstreams
+    const TK = silver ? [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] : [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0];
+    for (let s = 0; s < 16; s++) {
+      if (!TK[s]) continue;
+      taiko(six(b, s), (s % 4 === 0 ? 0.42 : 0.24) * (silver ? 1 : 0.85), s % 4 === 0 ? 0.9 : s % 2 ? 1.35 : 1.15, s % 2 ? 0.35 : -0.35);
+    }
   }
+  // Industries: a taiko roll building into the project experience
+  if (ind) for (let s = 8; s < 16; s++) taiko(six(b, s), 0.16 + (s - 8) * 0.04, s % 2 ? 1.3 : 1.05, s % 2 ? 0.4 : -0.4);
+
+  // Braams: one per section entrance, and every bar through the climax
+  if (b === 0 || b === 4 || b === 7 || b === 12 || silver) braam(t, silver ? 2.2 : 2.3, root(t), silver ? 0.42 : 0.34);
 
   // Lead motif — sung wide across the projects and the climax
-  const LEAD: Record<number, [number, number][]> = {
-    12: [[74, 1]], // D over B♭
-    13: [[81, 1]], // A over F
-    14: [[76, 0.5], [77, 0.5]], // E F over Gm
-    15: [[76, 1]], // E over A
-    16: [[74, 0.5], [77, 0.5]], // D F over B♭
-    17: [[76, 0.5], [79, 0.5]], // E G over C
-    18: [[81, 1]], // A, suspended over Dsus4 — held, unresolved, cut
-  };
   if (LEAD[b]) {
     let at = t;
     for (const [m, frac] of LEAD[b]) {
-      lead(at, frac * len - 0.04, m, inSec(b, SEC.silver) ? 0.14 : 0.11);
-      if (inSec(b, SEC.silver)) lead(at, frac * len - 0.04, m - 12, 0.06);
+      lead(at, frac * len - 0.04, m, silver ? 0.15 : 0.12);
+      lead(at, frac * len - 0.04, m - 12, silver ? 0.08 : 0.05);
       at += frac * len;
     }
   }
 }
 
 // Accents under picture events
-impact(S.tech, 0.25, 0.8); // technology begins
-SYNC.techCuts.forEach((c, i) => whoosh(c, 1.1, 0.22, i % 2 ? -1 : 1)); // UF → RO → desalination → reclamation
-SYNC.sceneCuts.forEach((c, i) => whoosh(c, 1.3, 0.26 + i * 0.03, i % 2 ? 1 : -1));
-// ENGINEER · INTEGRATE · DELIVER land on beat 3 of bars 5–7
-[4, 5, 6].forEach((b) => impact(beat(b, 2), 0.42));
+subDrop(S.tech, 0.4);
+impact(S.tech, 0.32, 0.9); // technology begins
+SYNC.techCuts.forEach((c, i) => whoosh(c, 1.1, 0.24, i % 2 ? -1 : 1)); // UF → RO → desalination → reclamation
+SYNC.sceneCuts.forEach((c, i) => whoosh(c, 1.3, 0.28 + i * 0.02, i % 2 ? 1 : -1));
+[S.eng, S.life, S.ind, S.proj, S.silver].forEach((at) => reverseCymbal(at, 1.25, 0.12));
+// ENGINEER · INTEGRATE · DELIVER land on beat 2 of each engineering bar
+[4, 5, 6].forEach((b) => impact(beat(b, 1), 0.46));
 // DESIGN → ENGINEER → BUILD → OPERATE change on the bar lines
-[9, 10, 11].forEach((b) => impact(bars[b].t, 0.45 + (b - 9) * 0.05));
+[8, 9, 10].forEach((b, i) => {
+  impact(bars[b].t, 0.48 + i * 0.05);
+  braam(bars[b].t, 1.6, chordAt(bars[b].t + 0.001).bass, 0.24 + i * 0.03);
+});
 // EPCC · O&M · BOT
-impact(beat(11, 2), 0.62, 1.2);
-crash(beat(11, 2), 0.12);
+impact(beat(10, 2), 0.66, 1.2);
+braam(beat(10, 2), 1.2, chordAt(beat(10, 2) + 0.001).bass, 0.34);
+crash(beat(10, 2), 0.14);
+// Industries: one bell tick per sector as its chip appears
+for (let i = 0; i < 6; i++) {
+  const at = six(11, 1 + i);
+  bell(at, snap(MOTIF[i % 4] + 12, chordAt(at + 0.001)), 0.06, i % 2 ? 0.45 : -0.45, 1.6, 0.4);
+}
 // Project experience: EMAS Project, then PRPC UF on the downbeat
-impact(S.proj, 0.5);
-crash(S.proj, 0.13);
-impact(q16(SYNC.prpc), 0.45);
+subDrop(S.proj, 0.36);
+impact(S.proj, 0.55);
+crash(S.proj, 0.14);
+impact(q16(SYNC.prpc), 0.5);
+braam(q16(SYNC.prpc), 1.8, chordAt(q16(SYNC.prpc) + 0.001).bass, 0.3);
 crash(q16(SYNC.prpc), 0.1);
 // PRPC figures counting up: glassy ticks, the motif again
 SYNC.stats.forEach((at, i) => {
   const t = q16(at);
   bell(t, snap(MOTIF[i] + 12, chordAt(t + 0.001)), 0.07, i % 2 ? 0.5 : -0.5, 2, 0.4);
 });
-// Tom fill into Silverstreams
-[12, 13, 14, 15].forEach((s, i) => tom(six(15, s), 50 - i * 3, 0.32, -0.4 + i * 0.25));
+// Fill into Silverstreams
+[12, 13, 14, 15].forEach((s, i) => {
+  tom(six(15, s), 50 - i * 3, 0.32, -0.4 + i * 0.25);
+  taiko(six(15, s), 0.3 + i * 0.06, 1.3 - i * 0.1, -0.3 + i * 0.2);
+});
 // Silverstreams: the largest moment, the campus reveal, the build into the cut
-impact(S.silver, 0.75, 1.3);
-crash(S.silver, 0.18);
-impact(bars[18].t, 0.55); // data-centre campus
-crash(bars[18].t, 0.12);
-riser(bars[18].t, DROP, 0.28);
-for (let s = 8; s < 16; s++) snare(six(18, s), 0.05 + (s - 8) * 0.018); // snare build
+subDrop(S.silver, 0.45);
+impact(S.silver, 0.78, 1.3);
+crash(S.silver, 0.2);
+impact(bars[18].t, 0.6); // data-centre campus
+crash(bars[18].t, 0.14);
+riser(bars[17].t + bars[17].len / 2, DROP, 0.3);
+for (let s = 0; s < 16; s++) snare(six(18, s), 0.04 + s * 0.012); // snare build
+for (let s = 8; s < 16; s++) taiko(six(18, s), 0.3 + (s - 8) * 0.04, 1.1, s % 2 ? 0.4 : -0.4);
 
 // 54–60 s · THE REVEAL — sudden silence, then restraint.
 // The light traces the logo to D – A – E; the logo lands with F♯. Resolution.
@@ -746,15 +908,19 @@ drone(S.reveal + 0.35, DUR, 0.05);
 bell(SYNC.trace, MOTIF_MAJOR[0], 0.11, -0.25, 4, 0.8);
 bell(SYNC.trace + SYNC.traceLen / 3, MOTIF_MAJOR[1], 0.1, 0.25, 4, 0.8);
 bell(SYNC.trace + (2 * SYNC.traceLen) / 3, MOTIF_MAJOR[2], 0.1, -0.1, 4, 0.8);
+reverseCymbal(SYNC.fill, 1.1, 0.1);
 bell(SYNC.fill, MOTIF_MAJOR[3], 0.14, 0, 3.4, 0.9); // F♯ — the major third, at last
 bell(SYNC.fill, MOTIF_MAJOR[3] + 12, 0.045, 0.3, 3, 0.9);
-// One final deep tonal impact
+// One final deep tonal impact: taiko, boom and a D-major braam
+taiko(SYNC.fill, 0.6, 0.75);
 voice(SYNC.fill, DUR - SYNC.fill, (t) => Math.sin(TAU * (mtof(26) * t + (3.5 * (1 - Math.exp(-t * 3))) / 3)) * Math.exp(-t * 0.85) * Math.min(1, t * 400), {
   gain: 0.42,
   rev: 0.2,
 });
-impact(SYNC.fill, 0.24, 1.4);
+braam(SYNC.fill, DUR - SYNC.fill - 0.2, 38, 0.2, true);
+impact(SYNC.fill, 0.26, 1.4);
 pad(SYNC.fill, DUR - SYNC.fill - 0.9, CH.Dmaj9.pad, 0.1, { attack: 0.06, release: 0.85, bright: 0.25, duck: false, rev: 0.7 });
+choir(SYNC.fill + 0.1, DUR - SYNC.fill - 1.1, [62, 66, 69, 74], 0.05);
 
 // Side-chain envelope from every kick
 const duckEnv = new Float32Array(N).fill(1);
@@ -781,10 +947,18 @@ for (let i = 0; i < N; i++) {
   const br = new Float32Array(D);
   let lpL = 0;
   let lpR = 0;
+  const cut = Math.floor(DROP * SR);
+  const cutFade = Math.floor(0.05 * SR);
   for (let i = 0; i < N; i++) {
     const p = i % D;
-    const yl = bl[p];
-    const yr = br[p];
+    // The echoes stop with everything else at the cut; only the reveal feeds them afterwards.
+    if (i === cut + cutFade) {
+      bl.fill(0);
+      br.fill(0);
+    }
+    const g = i < cut ? 1 : i < cut + cutFade ? 1 - (i - cut) / cutFade : 1;
+    const yl = bl[p] * g;
+    const yr = br[p] * g;
     lpL += 0.35 * (yr - lpL);
     lpR += 0.35 * (yl - lpR);
     bl[p] = (DLY[0][i] + DLY[1][i]) * 0.5 + lpL * 0.42;
@@ -827,7 +1001,7 @@ const reverb = (inp: readonly [Float32Array, Float32Array], wet: number, room: n
   }
 };
 const dropSample = DROP * SR;
-reverb(REV_A, 0.9, 0.86, 0.28, (n) => (n < dropSample ? 1 : Math.max(0, 1 - (n - dropSample) / (0.22 * SR))));
+reverb(REV_A, 0.9, 0.86, 0.28, (n) => (n < dropSample ? 1 : Math.max(0, 1 - (n - dropSample) / (0.1 * SR))));
 reverb(REV_B, 1.1, 0.9, 0.22);
 
 // ── Master: DC block, glue compression, soft clip, normalise, fade ──────────
@@ -837,7 +1011,7 @@ reverb(REV_B, 1.1, 0.9, 0.22);
   let env = 0;
   const att = Math.exp(-1 / (0.006 * SR));
   const rel = Math.exp(-1 / (0.18 * SR));
-  const thr = 0.5;
+  const thr = 0.38;
   for (let i = 0; i < N; i++) {
     const l = OUT[0][i];
     const r = OUT[1][i];
@@ -846,7 +1020,7 @@ reverb(REV_B, 1.1, 0.9, 0.22);
     x1L = l; y1L = yl; x1R = r; y1R = yr;
     const lvl = Math.max(Math.abs(yl), Math.abs(yr));
     env = lvl > env ? att * env + (1 - att) * lvl : rel * env + (1 - rel) * lvl;
-    const gr = env > thr ? (thr + (env - thr) / 2.5) / env : 1;
+    const gr = env > thr ? (thr + (env - thr) / 3) / env : 1;
     OUT[0][i] = Math.tanh(yl * gr * 1.15);
     OUT[1][i] = Math.tanh(yr * gr * 1.15);
   }
@@ -890,7 +1064,8 @@ const marks: [string, number, number][] = [
   ["water 0–7", 0, S.tech],
   ["technology", S.tech, S.eng],
   ["engineering", S.eng, S.life],
-  ["operation", S.life, S.proj],
+  ["operation", S.life, S.ind],
+  ["industries", S.ind, S.proj],
   ["projects", S.proj, S.silver],
   ["silverstreams", S.silver, S.reveal],
   ["last beat before cut", S.reveal - 0.5, S.reveal],

@@ -9,18 +9,19 @@ export const VIDEO = { width: 1920, height: 1080, fps: 30 } as const;
 /** Seconds → frames at the project frame rate. */
 export const sec = (s: number) => Math.round(s * VIDEO.fps);
 
-export type SceneId = "origin" | "technology" | "engineering" | "lifecycle" | "projects" | "silverstreams" | "reveal";
+export type SceneId = "origin" | "technology" | "engineering" | "lifecycle" | "industries" | "projects" | "silverstreams" | "reveal";
 
 export type SceneConfig = { id: SceneId; title: string; durationSec: number };
 
 export const SCENES: SceneConfig[] = [
   { id: "origin", title: "1 · Water / origin", durationSec: 7 },
   { id: "technology", title: "2 · Water technology", durationSec: 10 },
-  { id: "engineering", title: "3 · Technology to engineering", durationSec: 10 },
+  { id: "engineering", title: "3 · Technology to engineering", durationSec: 7.5 },
   { id: "lifecycle", title: "4 · Engineering through operation", durationSec: 10 },
-  { id: "projects", title: "5 · Project experience", durationSec: 10 },
-  { id: "silverstreams", title: "6 · Silverstreams", durationSec: 7 },
-  { id: "reveal", title: "7 · Envirotech reveal", durationSec: 6 },
+  { id: "industries", title: "5 · Industries we serve", durationSec: 2.5 },
+  { id: "projects", title: "6 · Project experience", durationSec: 10 },
+  { id: "silverstreams", title: "7 · Silverstreams", durationSec: 7 },
+  { id: "reveal", title: "8 · Envirotech reveal", durationSec: 6 },
 ];
 
 export type SceneTiming = SceneConfig & { from: number; durationInFrames: number };
@@ -46,7 +47,8 @@ export const VO: { text: string; inSec: number; outSec: number }[] = [
   { text: "Water is the foundation of everything we build.", inSec: 3.4, outSec: 6.6 },
   { text: "At Envirotech, we integrate water and wastewater technologies with engineering, infrastructure and operations.", inSec: 7.6, outSec: 13.4 },
   { text: "From ultrafiltration and reverse osmosis, to desalination, water reclamation and integrated water systems.", inSec: 13.8, outSec: 19.6 },
-  { text: "From engineering and project delivery, through operation and long-term performance.", inSec: 27.6, outSec: 32.4 },
+  { text: "From engineering and project delivery, through operation and long-term performance.", inSec: 25.2, outSec: 30.0 },
+  { text: "For data centres, industry and cities.", inSec: 34.7, outSec: 36.9 },
   { text: "With experience across project management and industrial water,", inSec: 38.0, outSec: 41.8 },
   { text: "and new data-centre water infrastructure now entering delivery.", inSec: 47.2, outSec: 50.4 },
   { text: "Envirotech. Integrated water solutions, from engineering through operation.", inSec: 50.6, outSec: 53.9 },
@@ -62,6 +64,11 @@ export const COPY = {
     { short: "", long: "Water reclamation" },
   ],
   engineering: ["Engineer", "Integrate", "Deliver"],
+  // Sectors from the Envirotech brand kit, with data centres first.
+  industries: {
+    title: "Industries we serve",
+    list: ["Data centres", "Oil, gas & petrochemical", "Industrial & process", "Municipal water", "Desalination", "Reuse & ZLD"],
+  },
   lifecycle: ["Design", "Engineer", "Build", "Operate"],
   deliveryModels: ["EPCC", "O&M", "BOT"],
   // Subtle line under the logo in the final reveal.

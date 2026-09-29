@@ -10,6 +10,7 @@ import { Scene1Origin } from "./scenes/Scene1Origin";
 import { Scene2Technology } from "./scenes/Scene2Technology";
 import { Scene3Engineering } from "./scenes/Scene3Engineering";
 import { Scene4Lifecycle } from "./scenes/Scene4Lifecycle";
+import { Scene5Industries } from "./scenes/Scene5Industries";
 import { Scene5Projects } from "./scenes/Scene5Projects";
 import { Scene6Silverstreams } from "./scenes/Scene6Silverstreams";
 import { Scene7Reveal } from "./scenes/Scene7Reveal";
@@ -26,6 +27,7 @@ const SCENE_COMPONENTS: Record<SceneId, React.FC> = {
   technology: Scene2Technology,
   engineering: Scene3Engineering,
   lifecycle: Scene4Lifecycle,
+  industries: Scene5Industries,
   projects: Scene5Projects,
   silverstreams: Scene6Silverstreams,
   reveal: Scene7Reveal,

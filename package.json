@@ -12,6 +12,7 @@
     "render:gpu": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v2.mp4 --props=props/final.json --gl=angle"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@react-three/fiber": "^9.8.1",
     "@remotion/cli": "^4.0.529",
     "@remotion/fonts": "^4.0.529",
