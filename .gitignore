@@ -2,3 +2,4 @@ node_modules/
 out/*
 !out/.gitkeep
 .DS_Store
+assets/concert_music/*.wav

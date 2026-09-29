@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Html5Audio, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { z } from "zod";
 import { ShaderCanvas } from "./gl/ShaderCanvas";
 import { CONCERT, LOOP_SEC, RAW_TAIL_SEC, SHOTS, beatAt, type ShotId } from "./timeline";
@@ -14,7 +14,12 @@ export const concertSchema = z.object({
   showLabels: z.boolean(),
   /** Render a single shot on its own (for review); empty = the full loop. */
   only: z.string(),
+  /** Include the original score (assets/concert_music/). */
+  music: z.boolean(),
 });
+
+// Written for this loop by tools/compose_concert_score.py: same length, same 120 BPM grid.
+const SCORE = "concert_music/envirotech_concert_score.mp3";
 export type ConcertProps = z.infer<typeof concertSchema>;
 
 type Layer = { key: string; id: ShotId; t: number; p: number; opacity: number };
@@ -48,7 +53,7 @@ const layersAt = (g: number, only: string): Layer[] => {
   return out;
 };
 
-export const EnvirotechConcert: React.FC<ConcertProps> = ({ shaderScale, showLabels, only }) => {
+export const EnvirotechConcert: React.FC<ConcertProps> = ({ shaderScale, showLabels, only, music }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const g = frame / fps;
@@ -87,9 +92,10 @@ export const EnvirotechConcert: React.FC<ConcertProps> = ({ shaderScale, showLab
         );
       })}
       {showLabels && <ProcessLabel g={g} only={only} />}
+      {music && !only && <Html5Audio src={staticFile(SCORE)} />}
     </AbsoluteFill>
   );
 };
 
-export const CONCERT_DEFAULTS: ConcertProps = { shaderScale: 1, showLabels: true, only: "" };
+export const CONCERT_DEFAULTS: ConcertProps = { shaderScale: 1, showLabels: true, only: "", music: true };
 export { CONCERT };
