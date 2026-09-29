@@ -92,3 +92,89 @@ is already installed, set `REMOTION_BROWSER=/path/to/chrome`.
 - Palette: Navy `#21528A`, Sea-green `#14B096`, Aqua `#16B1C4`, Slate `#4A5C6A`, Paper `#F4F7FB`.
 - Motion uses smooth easing and line sweeps only: no bounce, springs or flashy transitions.
 - File names use underscores.
+
+---
+
+# Envirotech concert visual (LED backdrop loop)
+
+A second, separate piece lives in `src/concert/`: **a seamless 3 min 24 s loop** designed as a
+large-format LED / projection backdrop with the scale and rhythm of a stadium-concert visual. It
+follows one journey of water through treatment and out into infrastructure, then resolves on
+the Envirotech mark and returns to darkness. The last frame flows into the first, so it can run on
+repeat for as long as the event needs.
+
+Everything is generated procedurally with GLSL shaders (no stock footage). Each frame is a pure
+function of time, so renders are deterministic and can be split across machines.
+
+## Running it
+
+```bash
+npm run studio                 # pick EnvirotechConcert, or a single shot under "ConcertShots"
+npm run render:concert:preview # quick 960×540 preview (half-resolution shaders)
+npm run render:concert         # 1920×1080 master → out/envirotech_concert_loop_1080p.mp4
+npm run render:concert:wide    # 3840×1080 (32:9) for unusually wide LED walls
+```
+
+Compositions:
+
+| id | size | use |
+| --- | --- | --- |
+| `EnvirotechConcert` | 1920×1080 | the main 16:9 loop |
+| `EnvirotechConcertUltrawide` | 3840×1080 | same loop, wider world; the brand stays centred and the same size |
+| `ConcertShots/Concert-<shot>` | 1920×1080 | one shot on its own, for review |
+
+Props (Studio props panel, or `--props`): `shaderScale` (1 = full resolution, 0.5 for fast drafts),
+`showLabels` (the four brief process labels; on by default), `only` (render one shot).
+
+**Render speed.** The scripts use `--gl=swangle` (software WebGL), which works on any machine,
+including servers without a GPU, but is slow: allow roughly 1–3 s per 1080p frame per CPU core.
+On a machine with a GPU, swap it for `--gl=angle` (or `--gl=vulkan` on Linux) for a large speed-up.
+Frame ranges can be rendered in parallel on several machines with `--frames=0-1999` etc.
+
+## The loop
+
+Times are from the start of the loop. 120 BPM, one bar = 2 s; the loop is exactly 102 bars.
+
+| # | shot | start | length | beat in the music |
+| --- | --- | --- | --- | --- |
+| 1 | Raw water: darkness, sediment, bubbles; light rises; particles gather into a stream | 0:00 | 22 s | low energy → rising |
+| 2 | Screening: monumental bar screens backlit through mist; into the intake pipe | 0:22 | 16 s | rising |
+| 3 | Coagulation / flocculation: particles collide and gather into flocs inside the pipe | 0:38 | 14 s | steady |
+| 4 | Ultrafiltration: flight through a forest of hollow fibres | 0:52 | 10 s | steady |
+| 5 | Inside one fibre: water escaping through the porous wall | 1:02 | 8 s | building |
+| 6 | UF array pull-back while pressure pulses double (the build-up) | 1:10 | 6 s | **build** |
+| 7 | Reverse osmosis: hundreds of pressure vessels, stage beams, crane up and over | 1:16 | 16 s | **drop** |
+| 8 | RO membrane: turbulent feed → thin membrane → calm luminous permeate | 1:32 | 16 s | high |
+| 9 | Ion exchange: resin-bead landscape, ions locking onto the beads | 1:48 | 16 s | easing |
+| 10 | Polishing: darkness, one clean luminous flow; noise falls away | 2:04 | 14 s | calm |
+| 11 | Clean water → the whole facility: pull-back, low-angle track, orbital sweep | 2:18 | 26 s | **climax** |
+| 12 | The network: sites and pipelines join and settle into a ring | 2:44 | 14 s | resolving |
+| 13 | ENVIROTECH: the ring flows into the logo, holds, dissolves into a stream | 2:58 | 16 s | resolution |
+| 14 | Return: into the stream, down to microscopic darkness → frame 1 | 3:14 | 10 s | restart |
+
+All shot lengths live in `src/concert/timeline.ts`; change a `durationSec` and everything after it
+moves. The musical intensity curve (`ENERGY_KEYS`) drives the light pulses (beat and downbeat
+flashes through the water, beams and pipe networks). To sync to a track, set `bpm` in `CONCERT`
+and keep shot lengths on whole bars; the build and the drop are at 1:10 and 1:16.
+
+## Files
+
+```
+src/concert/
+  timeline.ts            shot list, BPM, energy curve
+  shots.ts               per-shot camera paths and shader parameters
+  EnvirotechConcert.tsx  layers the shots, crossfades, loop wrap
+  BrandReveal.tsx        particles sampled from the official logo
+  ProcessLabel.tsx       the brief, restrained process labels
+  camera.ts              spline helpers
+  gl/ShaderCanvas.tsx    WebGL2 full-frame shader layer
+  glsl/                  one shader per environment, plus common.ts (palette, noise, film finish)
+```
+
+The brand palette is defined once, in linear light, at the top of `glsl/common.ts`: Deep Navy
+`#0B2239` and Envirotech Blue `#21528A` carry the darkness, Slate `#4A5C6A` the steel, and Sea Green
+`#14B096` / Aqua `#16B1C4` are kept for water, light and energy. The only typography is the
+ENVIROTECH logo (from `assets/logo/`) and four optional process labels.
+
+The facility, vessels and network are a stylised composite of modern water infrastructure, not any
+real Envirotech site.
