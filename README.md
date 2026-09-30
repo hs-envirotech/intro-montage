@@ -16,9 +16,9 @@ git checkout claude/laughing-faraday-amnihv
 npm install
 
 npm run studio        # preview in the browser at http://localhost:3000
-npm run render:gpu    # render out/envirotech_intro_v2.mp4 using your graphics card (fastest)
+npm run render:gpu    # render out/envirotech_intro_v3.mp4 using your graphics card (fastest)
 npm run render        # same, software 3D: slower, works on any machine
-npm run render:review # out/envirotech_intro_v2_review.mp4 with VO subtitles + placeholder tags
+npm run render:review # out/envirotech_intro_v3_review.mp4 with VO subtitles + placeholder tags
 ```
 
 The first render downloads Remotion's own headless Chrome (about 100 MB). With a GPU, a full render

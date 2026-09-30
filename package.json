@@ -5,11 +5,11 @@
   "description": "Envirotech 60-second corporate intro video (Remotion)",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v2.mp4 --props=props/final.json",
-    "render:review": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v2_review.mp4 --props=props/review.json",
+    "render": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v3.mp4 --props=props/final.json",
+    "render:review": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v3_review.mp4 --props=props/review.json",
     "score": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/compose_score.mts",
     "typecheck": "tsc --noEmit",
-    "render:gpu": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v2.mp4 --props=props/final.json --gl=angle"
+    "render:gpu": "remotion render src/index.ts EnvirotechIntro out/envirotech_intro_v3.mp4 --props=props/final.json --gl=angle"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
