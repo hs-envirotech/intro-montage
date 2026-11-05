@@ -35,6 +35,25 @@ export interface EngineSnapshot {
 let nextId = 1;
 
 /**
+ * Single-file builds (the claude.ai demo page) embed the worklet code in
+ * window.__MUSE_WORKLETS__ because separate script files can't be loaded there.
+ * Try a blob: URL, then a data: URL; the normal build just uses the file URL.
+ */
+async function loadWorklet(ctx: AudioContext, name: 'guitar' | 'recorder', url: string) {
+  const inline = (window as unknown as { __MUSE_WORKLETS__?: Record<string, string> }).__MUSE_WORKLETS__?.[name];
+  if (!inline) return ctx.audioWorklet.addModule(url);
+  const blobUrl = URL.createObjectURL(new Blob([inline], { type: 'text/javascript' }));
+  try {
+    await ctx.audioWorklet.addModule(blobUrl);
+  } catch {
+    const b64 = btoa(unescape(encodeURIComponent(inline)));
+    await ctx.audioWorklet.addModule(`data:text/javascript;base64,${b64}`);
+  } finally {
+    URL.revokeObjectURL(blobUrl);
+  }
+}
+
+/**
  * The single shared guitar engine. Two worklet instances ("rhythm" for riffs and
  * "lead" for live playing) share one tone stack / cabinet / FX / limiter chain, so
  * every mode sounds like the same rig while riff and lead volumes stay independent.
@@ -107,7 +126,7 @@ export class AudioEngine {
         ? 'This browser does not support AudioWorklet.'
         : 'Audio engine needs a secure context (https:// or localhost). See README → "Play it on your Android phone".');
     }
-    await Promise.all([ctx.audioWorklet.addModule(guitarWorkletUrl), ctx.audioWorklet.addModule(recorderWorkletUrl)]);
+    await Promise.all([loadWorklet(ctx, 'guitar', guitarWorkletUrl), loadWorklet(ctx, 'recorder', recorderWorkletUrl)]);
     const fx = new FxChain(ctx);
     this.fx = fx;
     fx.output.connect(ctx.destination);

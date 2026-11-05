@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')!).render(
 );
 
 // Offline support: cache the app shell after the first visit (production builds only).
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+if ('serviceWorker' in navigator && import.meta.env.PROD && import.meta.env.MODE !== 'artifact') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => { /* e.g. self-signed cert on LAN */ });
   });

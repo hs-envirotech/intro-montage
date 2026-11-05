@@ -116,6 +116,8 @@ export function SettingsSheet() {
 
 const fmt = (ms?: number) => (ms === undefined ? 'n/a' : `${ms.toFixed(1)} ms`);
 
+const CAN_DOWNLOAD = import.meta.env.MODE !== 'artifact';
+
 interface Recording { id: string; name: string; created: number; duration: number; wav: Blob; compressed?: Blob }
 
 export function RecordSheet() {
@@ -141,6 +143,7 @@ export function RecordSheet() {
   return (
     <SheetFrame title="RECORDINGS">
       <p className="fine">Use the ● REC button in the top bar. Recording captures the app's own guitar output with all effects — no microphone is used.</p>
+      {!CAN_DOWNLOAD && <p className="fine">This web demo can record and play back, but it can't save files. WAV export works in the installed app.</p>}
       {!list.length && <p className="empty">No recordings yet.</p>}
       <ul className="recs">
         {list.map((r) => (
@@ -148,8 +151,8 @@ export function RecordSheet() {
             <div className="rec-meta"><b>{r.name}</b><small>{r.duration.toFixed(1)} s · {new Date(r.created).toLocaleString()}</small></div>
             <div className="rec-actions">
               <button className="btn sq" onClick={() => play(r)} aria-label="Play">{playing === r.id ? '■' : '▶'}</button>
-              <button className="btn" onClick={() => download(r.wav, `${r.name}.wav`)}>WAV</button>
-              {r.compressed && <button className="btn" onClick={() => download(r.compressed!, `${r.name}.${ext(r.compressed!)}`)}>{ext(r.compressed).toUpperCase()}</button>}
+              {CAN_DOWNLOAD && <button className="btn" onClick={() => download(r.wav, `${r.name}.wav`)}>WAV</button>}
+              {CAN_DOWNLOAD && r.compressed && <button className="btn" onClick={() => download(r.compressed!, `${r.name}.${ext(r.compressed!)}`)}>{ext(r.compressed).toUpperCase()}</button>}
               <button className="btn sq danger" onClick={() => idbDelete('recordings', r.id).then(refresh)} aria-label="Delete">✕</button>
             </div>
           </li>

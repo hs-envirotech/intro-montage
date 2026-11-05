@@ -19,7 +19,7 @@ body { overscroll-behavior: none; overflow: hidden; user-select: none; -webkit-u
 button { font: inherit; color: inherit; touch-action: manipulation; }
 
 .app {
-  height: 100dvh;
+  height: 100%;
   display: grid;
   grid-template-rows: auto auto auto 1fr auto;
   grid-template-areas: "top" "tabs" "banner" "stage" "bottom";
