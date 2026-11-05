@@ -1,0 +1,27 @@
+{
+  "name": "muse-rig",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "MUSE RIG — Pocket Guitar. A touchscreen virtual electric guitar PWA (Phase 1: Fury).",
+  "scripts": {
+    "dev": "vite --host",
+    "dev:https": "vite --host --mode https",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc -b",
+    "test:audio": "node scripts/audio-smoke-test.mjs"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-basic-ssl": "^2.0.0",
+    "@vitejs/plugin-react": "^4.5.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  }
+}
